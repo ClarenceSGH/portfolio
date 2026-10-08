@@ -71,3 +71,9 @@ git push
 ```
 
 Le site se met à jour 1 à 2 minutes après (recharge avec Ctrl+F5 si besoin).
+
+## Google
+
+- `google7d03f6697d4d451d.html` prouve à Google Search Console que le site est à toi : ne le supprime pas.
+- `sitemap.xml` liste les pages du site pour Google. Si tu ajoutes un projet, ajoute sa page
+  (`projet.html?p=<slug>`) dans ce fichier.
