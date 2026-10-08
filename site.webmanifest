@@ -1,0 +1,19 @@
+{
+  "name": "Clarence Seguy-Houel, designer UX/UI",
+  "short_name": "Clarence",
+  "icons": [
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#f4f4f1",
+  "background_color": "#f4f4f1",
+  "display": "browser"
+}
