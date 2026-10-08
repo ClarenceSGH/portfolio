@@ -1003,19 +1003,11 @@ html:not(.has-device-scroll) .story .device__screen { overflow-y: auto; }
   .chapter__head { position: static; }
   .offset > * { grid-column: 1; }
   .stage { width: calc(100% - 2 * var(--gutter)); padding: 22px; border-radius: var(--radius); }
-  .phones {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: 64%;
-    max-width: none;
-    margin: 0 -22px;
-    padding: 0 22px 6px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-  .phones::-webkit-scrollbar { display: none; }
-  .phones__item { scroll-snap-align: center; }
+  /* téléphone : les écrans en grille de 2, tous visibles en entier ;
+     s'il y en a un nombre impair, le dernier est centré */
+  .phones { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 18px; max-width: none; }
+  .phones__item:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 9px); }
+  .phones__label { margin-top: 14px; font-size: 0.95rem; }
   .showcase { flex-direction: column; align-items: center; gap: 28px; }
   .showcase__item--mac { flex: none; width: 100%; }
   .showcase__item--iphone { flex: none; width: 56%; margin: 0; }
