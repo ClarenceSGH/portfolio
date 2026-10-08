@@ -23,6 +23,11 @@ Le mode d'emploi de chaque bloc est en haut de `js/projects.js`.
 
 Chaque projet a sa page automatiquement : `projet.html?p=<slug>` (le `slug` est défini dans `js/projects.js`).
 
+Typographie : dans les titres, les petits mots (le, la, une, de, au, six…) ne restent jamais seuls
+en fin de ligne, ils passent à la ligne avec le mot suivant (« Quatre gestes, / une prise »).
+C'est automatique (`PF.typo` dans `js/common.js`), y compris pour les nouveaux textes. Les espaces
+insécables avant : ; ! ? sont aussi ajoutées toutes seules.
+
 ## Animations
 
 Navigation par étapes : sur l'accueil, un seul geste (cran de molette, glissement du doigt,

@@ -25,9 +25,46 @@
     });
   };
 
+  /* Typographie française
+     - petits mots (articles, déterminants, prépositions…) et nombres liés au mot suivant
+       par une espace insécable : jamais seuls en fin de ligne (« Quatre gestes, / une prise ») ;
+     - espace insécable avant : ; ! ? » et après «, et avant un tiret.
+     full = false : seulement la ponctuation (pour les paragraphes). */
+  var PETITS = "à|a|au|aux|avec|ce|ces|cet|cette|chez|d'|dans|de|des|du|elle|elles|en|entre|et|il|ils|je|j'|l'|la|le|les|leur|leurs|ma|mes|mon|ne|n'|ni|nos|notre|on|ou|où|par|pour|qu'|que|qui|s'|sa|sans|se|ses|son|sous|sur|ta|tes|ton|tu|un|une|vers|vos|votre|y|chaque|plusieurs|quelques|tout|toute|tous|toutes|aucun|aucune|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|cent|mille|\\d+(?:[.,]\\d+)?";
+  var reCourt = new RegExp("(^|[\\s\\u00a0'’(«])(" + PETITS + ") (?=\\S)", "giu");
+  PF.typo = function (text, full) {
+    var t = String(text)
+      .replace(/ ([:;!?»])/g, " $1")
+      .replace(/« /g, "« ")
+      .replace(/ ([–—]) /g, " $1 ")
+      .replace(/Nantes Atlantique/g, "Nantes Atlantique"); // un nom propre ne se coupe pas
+    if (full === false) return t;
+    for (var i = 0, prev; i < 4 && prev !== t; i++) { prev = t; t = t.replace(reCourt, "$1$2 "); }
+    return t;
+  };
+
+  // Applique la règle aux textes déjà dans la page (titres : règle complète ; paragraphes : ponctuation)
+  var TITRES = "h1, h2, h3, .about__statement, .quote__text, .learning, .statement, .case__summary, .next__title, .panel__title";
+  var TEXTES = "p, li, dd, dt, figcaption, blockquote, time";
+  PF.typoFix = function (scope) {
+    scope = scope || document;
+    [[TITRES, true], [TEXTES, false]].forEach(function (pair) {
+      scope.querySelectorAll(pair[0]).forEach(function (el) {
+        var walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        var node;
+        while ((node = walk.nextNode())) {
+          var full = pair[1] || !!(node.parentNode.closest && node.parentNode.closest(TITRES));
+          var v = PF.typo(node.nodeValue, full);
+          if (v !== node.nodeValue) node.nodeValue = v;
+        }
+      });
+    });
+  };
+
   /* Découpe un titre en mots animables */
   PF.words = function (text) {
-    return String(text)
+    // les mots liés par une espace insécable restent ensemble
+    return PF.typo(text)
       .split(" ")
       .map(function (w) { return '<span class="w"><span>' + PF.esc(w) + "</span></span>"; })
       .join(" ");
@@ -266,6 +303,7 @@
   };
 
   PF.start = function () {
+    PF.typoFix();
     initSmoothScroll();
     initNav();
     initCopyEmail();

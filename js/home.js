@@ -496,7 +496,7 @@
     if (!el || !PF.hasGsap) return;
     el.innerHTML = el.textContent
       .trim()
-      .split(/\s+/)
+      .split(/ +/) // espaces normales seulement : les insécables gardent les mots liés
       .map(function (w) { return '<span class="sw">' + esc(w) + "</span>"; })
       .join(" ");
     gsap.fromTo(el.querySelectorAll(".sw"), { opacity: 0.18 }, {
