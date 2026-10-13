@@ -40,6 +40,19 @@
       "</div></div></div>";
   }
 
+  /* ---------- Sommaire des projets, dans le haut de page ---------- */
+  function renderIndex() {
+    var list = document.querySelector("[data-hero-index]");
+    if (!list) return;
+    if (!projects.length) { list.closest(".hero__index").remove(); return; }
+    list.innerHTML = projects.map(function (p, i) {
+      return '<li><a href="projet.html?p=' + encodeURIComponent(p.slug) + '">' +
+        '<span class="hero__index-title">' + esc(p.title) + "</span>" +
+        '<span class="hero__index-type">' + esc(p.type) + "</span>" +
+      "</a></li>";
+    }).join("");
+  }
+
   /* ---------- Projets ---------- */
   function renderProjects() {
     var stack = document.querySelector("[data-stack]");
@@ -104,7 +117,7 @@
       .fromTo("[data-hero-item]", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 1.1, stagger: 0.08 }, 0.5)
       .fromTo(".wall", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.4, ease: "power2.out" }, 0)
       .fromTo(".wall__move", { z: -500, rotationX: -14, yPercent: 8 }, { z: 0, rotationX: 0, yPercent: 0, duration: 2.4 }, 0)
-      .fromTo(".nav__list", { autoAlpha: 0, y: -10 }, { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" }, 0.55);
+      .fromTo(".nav__links, .nav__tools", { autoAlpha: 0, y: -10 }, { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" }, 0.55);
     return tl;
   }
 
@@ -554,6 +567,7 @@
   }
 
   renderWall();
+  renderIndex();
   renderProjects();
   PF.start();
   var hero = PF.animate ? heroIn() : null;
@@ -563,6 +577,7 @@
   if (stage) initSteps(stage);
   initQuote();
   initStatement();
+  PF.initSpy();
   initLoader(hero);
   // plusieurs sections restent épinglées : on recalcule dans l'ordre de la page
   if (PF.hasGsap) { ScrollTrigger.sort(); ScrollTrigger.refresh(); }

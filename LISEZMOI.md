@@ -20,6 +20,8 @@
 | L'icône de l'onglet (favicon)      | `favicon.svg` (la signature rouge sur un carré cyan), avec ses versions `favicon.ico`, `assets/favicon-32.png`, `assets/icon-192.png`, `assets/icon-512.png` et `assets/apple-touch-icon.png` ; couleurs de l'appli installée dans `site.webmanifest` |
 | Le mur d'écrans du haut de page     | miniatures dans `assets/mur/`, liste en haut de `js/home.js` (`WALL`) |
 | La phrase « Je recherche un stage… » | `index.html`, dernière phrase sous le grand titre |
+| La liste « Projets » du haut de page | automatique, à partir de `js/projects.js` |
+| La page « introuvable » (erreur 404) | `404.html` |
 
 Les images de projets vont dans `assets/projets/<slug>/` (un dossier par projet).
 La page d'un projet se construit avec la liste `story` de `js/projects.js` : une suite de blocs
@@ -33,10 +35,21 @@ en fin de ligne, ils passent à la ligne avec le mot suivant (« Quatre gestes, 
 C'est automatique (`PF.typo` dans `js/common.js`), y compris pour les nouveaux textes. Les espaces
 insécables avant : ; ! ? sont aussi ajoutées toutes seules.
 
+## Mise en page
+
+- **Barre du haut** : la signature à gauche, les liens au centre (la section affichée est soulignée
+  pendant le scroll), le CV et le thème à droite. Sur téléphone, un bouton menu ouvre un menu
+  plein écran (fermeture : bouton, lien ou touche Échap).
+- **Couleurs** : une seule couleur d'accent par thème (rouge en clair, jaune en sombre). Le rose et
+  le rouge restent des touches d'identité : la citation et le contact sont des panneaux arrondis
+  posés en retrait des bords, comme les scènes des pages projet.
+- **Pages projet** : une fine barre de progression de lecture en haut et, en bas, le projet suivant
+  avec un aperçu de sa couverture.
+
 ## Animations
 
-Arrivée sur le site : sur fond rouge, la signature s'écrit au stylo, puis rejoint le centre
-de la barre du haut pendant que le rideau se lève sur le haut de page.
+Arrivée sur le site : sur fond rouge, la signature s'écrit au stylo, puis rejoint sa place
+à gauche de la barre du haut pendant que le rideau se lève sur le haut de page.
 Un geste (molette, clic, touche) pendant l'écriture l'accélère. L'animation ne se rejoue pas
 quand on revient d'une page projet (elle se rejoue si on recharge la page).
 Au survol, la signature de la barre du haut se réécrit ; en bas de chaque page, elle s'écrit en grand.

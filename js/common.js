@@ -251,6 +251,100 @@
     });
   }
 
+  /* Menu plein écran (téléphone) : s'ouvre depuis le haut, se ferme avec Échap,
+     un lien ou le bouton ; le reste de la page est mis hors d'atteinte pendant ce temps */
+  function initMenu() {
+    var btn = document.querySelector("[data-menu-toggle]");
+    var menu = document.querySelector("[data-menu]");
+    if (!btn || !menu) return;
+    var outside = document.querySelectorAll("main, footer, .skip, .nav__brand, .nav__links");
+    var timer;
+
+    function open() {
+      clearTimeout(timer);
+      menu.hidden = false;
+      menu.offsetHeight; // le navigateur pose l'état fermé avant d'animer
+      menu.classList.add("is-open");
+      root.classList.add("has-menu");
+      btn.setAttribute("aria-expanded", "true");
+      btn.setAttribute("aria-label", "Fermer le menu");
+      outside.forEach(function (el) { el.inert = true; });
+      PF.locked = true;
+      if (PF.lenis) PF.lenis.stop();
+      var first = menu.querySelector("a");
+      if (first) first.focus({ preventScroll: true });
+    }
+    function close(restoreFocus) {
+      menu.classList.remove("is-open");
+      root.classList.remove("has-menu");
+      btn.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-label", "Ouvrir le menu");
+      outside.forEach(function (el) { el.inert = false; });
+      PF.locked = false;
+      if (PF.lenis) PF.lenis.start();
+      timer = setTimeout(function () { menu.hidden = true; }, 600);
+      if (restoreFocus) btn.focus({ preventScroll: true });
+    }
+    PF.closeMenu = function () { if (!menu.hidden) close(false); };
+
+    btn.addEventListener("click", function () {
+      if (btn.getAttribute("aria-expanded") === "true") close(true);
+      else open();
+    });
+    // un lien : on ferme d'abord (la page se débloque), puis le lien fait son travail
+    menu.addEventListener("click", function (e) {
+      if (e.target.closest("a")) close(false);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && btn.getAttribute("aria-expanded") === "true") close(true);
+    });
+    // en repassant sur grand écran, le menu n'a plus lieu d'être
+    window.matchMedia("(min-width: 768px)").addEventListener("change", function (m) {
+      if (m.matches) PF.closeMenu();
+    });
+  }
+
+  /* La barre du haut surligne la section affichée (accueil) */
+  PF.initSpy = function () {
+    var links = document.querySelectorAll("[data-spy]");
+    if (!links.length || !hasGsap) return;
+    function set(id) {
+      links.forEach(function (a) {
+        if (a.getAttribute("data-spy") === id) a.setAttribute("aria-current", "location");
+        else a.removeAttribute("aria-current");
+      });
+    }
+    links.forEach(function (a, i) {
+      var id = a.getAttribute("data-spy");
+      var section = document.getElementById(id);
+      if (!section) return;
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 55%",
+        // la dernière section reste surlignée jusqu'en bas de la page
+        end: i === links.length - 1 ? "max" : "bottom 55%",
+        onToggle: function (self) {
+          if (self.isActive) set(id);
+          else if (a.hasAttribute("aria-current")) set(null);
+        },
+      });
+    });
+  };
+
+  /* Page projet : barre de progression de lecture */
+  function initProgress() {
+    if (!document.querySelector("[data-case]") || !PF.animate) return;
+    var bar = document.createElement("div");
+    bar.className = "progress";
+    bar.setAttribute("aria-hidden", "true");
+    document.body.appendChild(bar);
+    gsap.to(bar, {
+      scaleX: 1,
+      ease: "none",
+      scrollTrigger: { start: 0, end: "max", scrub: 0.3 },
+    });
+  }
+
   /* Éléments [data-reveal] qui apparaissent en entrant dans l'écran */
   PF.initReveals = function () {
     if (!PF.animate) return;
@@ -508,12 +602,14 @@
     initSmoothScroll();
     initBrand();
     initNav();
+    initMenu();
     initCopyEmail();
     PF.watchImages();
     PF.initReveals();
     initTheme();
     initTilt();
     initFooterSig();
+    initProgress();
     var year = document.querySelector("[data-year]");
     if (year) year.textContent = new Date().getFullYear();
     if (hasGsap && document.fonts) document.fonts.ready.then(function () { ScrollTrigger.refresh(); });

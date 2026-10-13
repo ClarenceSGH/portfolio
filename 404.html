@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Page introuvable | Clarence Seguy-Houel</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ddfdfe">
+  <!-- GitHub Pages sert cette page pour toute adresse inconnue, même dans un sous-dossier :
+       les liens partent donc tous de la racine du site -->
+  <base href="https://clarencesgh.github.io/portfolio/">
+
+  <link rel="icon" href="favicon.ico" sizes="32x32">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Geist:wght@300..700&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    (function (h) {
+      var theme = null;
+      try { theme = localStorage.getItem("pf-theme"); } catch (e) {}
+      h.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+    })(document.documentElement);
+  </script>
+</head>
+<body>
+  <header class="nav is-solid">
+    <a class="nav__brand" href="./" aria-label="Clarence Seguy-Houel, accueil">
+      <img src="assets/signature.svg" alt="" width="581" height="492">
+    </a>
+  </header>
+
+  <main class="not-found">
+    <p class="label">Erreur 404</p>
+    <h1 class="heading">Cette page n'existe pas.</h1>
+    <p>L'adresse a peut-être changé, ou une lettre s'est glissée de travers. Tout le travail est sur la page d'accueil.</p>
+    <div class="not-found__actions">
+      <a class="btn btn--primary" href="./#projets">Voir les projets <i class="ph ph-arrow-right"></i></a>
+      <a class="link" href="./#contact">Me contacter</a>
+    </div>
+  </main>
+</body>
+</html>

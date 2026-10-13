@@ -258,9 +258,13 @@
     document.title = "Projet introuvable | Clarence Seguy-Houel";
     main.innerHTML =
       '<section class="not-found">' +
+        '<p class="label">Erreur 404</p>' +
         '<h1 class="heading">Projet introuvable</h1>' +
         "<p>Ce projet n'existe pas ou a changé d'adresse. Les autres sont sur la page d'accueil.</p>" +
-        '<a class="btn btn--primary" href="index.html#projets">Voir les projets</a>' +
+        '<div class="not-found__actions">' +
+          '<a class="btn btn--primary" href="index.html#projets">Voir les projets <i class="ph ph-arrow-right"></i></a>' +
+          '<a class="link" href="index.html#contact">Me contacter</a>' +
+        "</div>" +
       "</section>";
   }
 
@@ -335,8 +339,14 @@
         (projects.length > 1
           ? '<a class="next" href="projet.html?p=' + encodeURIComponent(next.slug) + '">' +
               '<span class="next__inner">' +
-                '<span class="next__label">Projet suivant</span>' +
-                '<span class="next__title heading">' + esc(next.title) + ' <i class="ph ph-arrow-right"></i></span>' +
+                '<span class="next__text">' +
+                  '<span class="next__label">Projet suivant</span>' +
+                  '<span class="next__title heading">' + esc(next.title) + ' <i class="ph ph-arrow-right"></i></span>' +
+                  '<span class="next__type">' + esc(next.type) + (next.year ? ", " + esc(next.year) : "") + "</span>" +
+                "</span>" +
+                (next.cover
+                  ? '<span class="next__media media"><img src="' + esc(next.cover) + '" alt="" loading="lazy" decoding="async"></span>'
+                  : "") +
               "</span>" +
             "</a>"
           : "") +
@@ -393,7 +403,7 @@
 
   /* ---------- animations ---------- */
   function animate() {
-    if (!PF.animate) return;
+    if (!PF.animate || index === -1) return;
     var tl = gsap.timeline({ defaults: { ease: "expo.out", duration: 1.3 } });
     tl.fromTo(".back", { opacity: 0, x: -10 }, { opacity: 1, x: 0 }, 0)
       .fromTo(".case__type", { opacity: 0, y: 10 }, { opacity: 1, y: 0 }, 0.1)

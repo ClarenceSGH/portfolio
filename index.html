@@ -2,10 +2,23 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Clarence Seguy-Houel, designer UX/UI</title>
   <meta name="description" content="Portfolio de Clarence Seguy-Houel, designer UX/UI : études de cas, de la recherche utilisateur à l'interface.">
   <meta name="theme-color" content="#ddfdfe">
+  <link rel="canonical" href="https://clarencesgh.github.io/portfolio/">
+
+  <!-- Aperçu quand le lien est partagé (LinkedIn, messageries…) -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="Clarence Seguy-Houel">
+  <meta property="og:title" content="Clarence Seguy-Houel, designer UX/UI">
+  <meta property="og:description" content="Des interfaces simples, avec du caractère. Études de cas : FISHDEX, Borne EDNA, DJ Platform.">
+  <meta property="og:url" content="https://clarencesgh.github.io/portfolio/">
+  <meta property="og:image" content="https://clarencesgh.github.io/portfolio/assets/projets/fishdex/cover.jpg">
+  <meta property="og:image:width" content="1920">
+  <meta property="og:image:height" content="1200">
+  <meta name="twitter:card" content="summary_large_image">
 
   <!-- Icône du site (onglet, favoris, écran d'accueil du téléphone) -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
@@ -50,20 +63,39 @@
     <div class="loader__sig" data-loader-sig></div>
   </div>
 
-  <nav class="nav" data-nav aria-label="Navigation principale">
-    <ul class="nav__list">
-      <li><a href="#projets">Projets</a></li>
-      <li><a href="#a-propos">À propos</a></li>
-    </ul>
+  <header class="nav" data-nav>
     <!-- la signature (logo) : remplacée par un dessin vectoriel animable au chargement -->
     <a class="nav__brand" href="#top" aria-label="Clarence Seguy-Houel, haut de page" data-sig>
       <img src="assets/signature.svg" alt="" width="581" height="492">
     </a>
-    <ul class="nav__list nav__list--right">
-      <li><a href="#contact">Contact</a></li>
-      <li><button class="theme-toggle" type="button" data-theme-toggle aria-label="Changer de thème"><i class="ph ph-moon" aria-hidden="true"></i><i class="ph ph-sun" aria-hidden="true"></i></button></li>
-    </ul>
-  </nav>
+    <nav class="nav__links" aria-label="Navigation principale">
+      <ul>
+        <li><a href="#projets" data-spy="projets">Projets</a></li>
+        <li><a href="#a-propos" data-spy="a-propos">À propos</a></li>
+        <li><a href="#contact" data-spy="contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav__tools">
+      <a class="nav__cv" href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf">CV <i class="ph ph-download-simple" aria-hidden="true"></i></a>
+      <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Changer de thème"><i class="ph ph-moon" aria-hidden="true"></i><i class="ph ph-sun" aria-hidden="true"></i></button>
+      <button class="icon-btn nav__burger" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <!-- Menu plein écran (téléphone) -->
+  <div class="menu" id="menu" data-menu hidden>
+    <nav aria-label="Menu">
+      <ol class="menu__list">
+        <li><a href="#projets">Projets</a></li>
+        <li><a href="#a-propos">À propos</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </nav>
+    <div class="menu__foot">
+      <a href="mailto:clarenceseguyhouel@gmail.com">clarenceseguyhouel@gmail.com</a>
+      <a href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf">Télécharger le CV <i class="ph ph-download-simple" aria-hidden="true"></i></a>
+    </div>
+  </div>
 
   <main id="contenu">
 
@@ -81,7 +113,12 @@
         <div class="hero__foot">
           <!-- la dernière phrase reprend le CV : modifie-la librement -->
           <p class="hero__intro" data-hero-item><strong>Clarence Seguy-Houel</strong>, étudiant en UX/UI design à L'École de Design Nantes Atlantique. Je conçois des parcours simples, de la recherche utilisateur au prototype. Je recherche un stage d'un mois en février 2027.</p>
-          <a class="btn btn--primary" href="#projets" data-hero-item>Voir les projets <i class="ph ph-arrow-down"></i></a>
+          <!-- sommaire des projets : généré à partir de js/projects.js -->
+          <nav class="hero__index" aria-label="Projets" data-hero-item>
+            <p class="label">Projets</p>
+            <ol data-hero-index></ol>
+          </nav>
+          <a class="btn btn--primary hero__cta" href="#projets" data-hero-item>Voir les projets <i class="ph ph-arrow-down"></i></a>
         </div>
       </div>
     </section>
@@ -102,7 +139,9 @@
 
     <!-- ============ À PROPOS ============ -->
     <section class="about" id="a-propos" aria-labelledby="a-propos-titre">
-      <h2 class="about__title label" id="a-propos-titre">À propos</h2>
+      <header class="section-head">
+        <h2 class="label" id="a-propos-titre">À propos</h2>
+      </header>
       <p class="about__statement" data-words>Une bonne interface ne se remarque pas. Elle guide, elle rassure et laisse toute la place au contenu. Mon travail commence toujours par les personnes qui vont l'utiliser.</p>
 
       <div class="about__grid">
@@ -115,48 +154,10 @@
 
         <div class="about__content">
           <p class="about__bio" data-reveal>Designer UX/UI, je conçois des parcours simples et des interfaces qui ont du caractère, de la recherche utilisateur au prototype. J'aime comprendre un problème en profondeur avant de dessiner le moindre écran : entretiens, parcours utilisateurs, puis prototypes testés et retravaillés jusqu'à ce que tout paraisse évident.</p>
+
           <div class="about__actions" data-reveal>
             <a class="btn btn--primary" href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf">Télécharger le CV <i class="ph ph-download-simple"></i></a>
-          </div>
-
-          <div class="skills">
-            <div data-reveal>
-              <h3 class="about__subtitle">Recherche</h3>
-              <ul>
-                <li>Entretiens utilisateurs</li>
-                <li>Personas</li>
-                <li>Parcours utilisateur</li>
-                <li>Tests d'utilisabilité</li>
-              </ul>
-            </div>
-            <div data-reveal>
-              <h3 class="about__subtitle">Conception</h3>
-              <ul>
-                <li>Architecture de l'information</li>
-                <li>Wireframes</li>
-                <li>Prototypage</li>
-                <li>Design system</li>
-              </ul>
-            </div>
-            <div data-reveal>
-              <h3 class="about__subtitle">Logiciels</h3>
-              <ul>
-                <li>Figma <small>avancé</small></li>
-                <li>Revit <small>bonne maîtrise</small></li>
-                <li>Illustrator <small>fonctions principales</small></li>
-                <li>HTML <small>bases</small></li>
-                <li>Framer <small>en apprentissage</small></li>
-                <li>Blender <small>en apprentissage</small></li>
-              </ul>
-            </div>
-            <div data-reveal>
-              <h3 class="about__subtitle">IA</h3>
-              <ul>
-                <li>Gemini</li>
-                <li>Claude</li>
-                <li>ChatGPT</li>
-              </ul>
-            </div>
+            <a class="link" href="https://www.linkedin.com/in/clarence-seguy-houel-967346442/" target="_blank" rel="noopener">LinkedIn <i class="ph ph-arrow-up-right"></i></a>
           </div>
 
           <!-- Parcours : remplace ces lignes par ta formation et tes expériences -->
@@ -170,6 +171,47 @@
           </div>
         </div>
       </div>
+
+      <!-- Compétences -->
+      <div class="skills">
+        <div data-reveal>
+          <h3 class="about__subtitle">Recherche</h3>
+          <ul>
+            <li>Entretiens utilisateurs</li>
+            <li>Personas</li>
+            <li>Parcours utilisateur</li>
+            <li>Tests d'utilisabilité</li>
+          </ul>
+        </div>
+        <div data-reveal>
+          <h3 class="about__subtitle">Conception</h3>
+          <ul>
+            <li>Architecture de l'information</li>
+            <li>Wireframes</li>
+            <li>Prototypage</li>
+            <li>Design system</li>
+          </ul>
+        </div>
+        <div data-reveal>
+          <h3 class="about__subtitle">Logiciels</h3>
+          <ul class="skills__levels">
+            <li>Figma <small>avancé</small></li>
+            <li>Revit <small>bonne maîtrise</small></li>
+            <li>Illustrator <small>fonctions principales</small></li>
+            <li>HTML <small>bases</small></li>
+            <li>Framer <small>en apprentissage</small></li>
+            <li>Blender <small>en apprentissage</small></li>
+          </ul>
+        </div>
+        <div data-reveal>
+          <h3 class="about__subtitle">IA</h3>
+          <ul>
+            <li>Gemini</li>
+            <li>Claude</li>
+            <li>ChatGPT</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <!-- ============ CONTACT ============ -->
@@ -177,19 +219,20 @@
       <div class="contact__inner">
         <h2 class="contact__title heading" id="contact-titre" data-split-lines><span class="line"><span>Un projet&nbsp;?</span></span><span class="line"><span>Écrivez-moi.</span></span></h2>
 
-        <a class="contact__email" href="mailto:clarenceseguyhouel@gmail.com" data-email data-reveal>clarenceseguyhouel@gmail.com</a>
-
-        <div class="contact__actions" data-reveal>
-          <button class="btn btn--secondary" type="button" data-copy-email>
+        <div class="contact__mail" data-reveal>
+          <a class="contact__email" href="mailto:clarenceseguyhouel@gmail.com" data-email>clarenceseguyhouel@gmail.com</a>
+          <button class="btn btn--ghost" type="button" data-copy-email>
             <i class="ph ph-copy" aria-hidden="true"></i><span data-copy-label>Copier l'adresse</span>
           </button>
-          <a class="btn btn--primary" href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf">Télécharger le CV <i class="ph ph-download-simple"></i></a>
         </div>
 
-        <ul class="socials" data-reveal>
-          <li><a href="https://www.linkedin.com/in/clarence-seguy-houel-967346442/" target="_blank" rel="noopener">LinkedIn <i class="ph ph-arrow-up-right"></i></a></li>
-          <li><a href="https://www.instagram.com/c.sgh.d/" target="_blank" rel="noopener">Instagram <i class="ph ph-arrow-up-right"></i></a></li>
-        </ul>
+        <div class="contact__foot" data-reveal>
+          <a class="btn btn--primary" href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf">Télécharger le CV <i class="ph ph-download-simple"></i></a>
+          <ul class="socials">
+            <li><a href="https://www.linkedin.com/in/clarence-seguy-houel-967346442/" target="_blank" rel="noopener">LinkedIn <i class="ph ph-arrow-up-right"></i></a></li>
+            <li><a href="https://www.instagram.com/c.sgh.d/" target="_blank" rel="noopener">Instagram <i class="ph ph-arrow-up-right"></i></a></li>
+          </ul>
+        </div>
       </div>
     </section>
   </main>
@@ -199,6 +242,11 @@
     <div class="footer__sig" data-footer-sig aria-hidden="true"></div>
     <div class="footer__bar">
       <p>© <span data-year>2026</span> Clarence Seguy-Houel</p>
+      <ul class="footer__links">
+        <li><a href="#projets">Projets</a></li>
+        <li><a href="#a-propos">À propos</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
       <a href="#top">Haut de page <i class="ph ph-arrow-up"></i></a>
     </div>
   </footer>
