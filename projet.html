@@ -48,9 +48,13 @@
 
   <header class="nav" data-nav>
     <!-- la signature (logo) : remplacée par un dessin vectoriel animable au chargement -->
-    <a class="nav__brand" href="index.html" aria-label="Clarence Seguy-Houel, accueil" data-sig>
-      <img src="assets/signature.svg" alt="" width="581" height="492">
-    </a>
+    <div class="nav__start">
+      <a class="nav__brand" href="index.html" aria-label="Clarence Seguy-Houel, accueil" data-sig>
+        <img src="assets/signature.svg" alt="" width="581" height="492">
+      </a>
+      <!-- le nom du projet, affiché dès que le grand titre sort de l'écran (js/project.js) -->
+      <a class="nav__project" href="#top" data-nav-project></a>
+    </div>
     <nav class="nav__links" aria-label="Navigation principale">
       <ul>
         <li><a href="index.html#projets" aria-current="page">Projets</a></li>

@@ -359,7 +359,7 @@
           (el.getBoundingClientRect().bottom < 0 ? past : shown).push(el);
         });
         if (past.length) gsap.set(past, { opacity: 1, y: 0 });
-        gsap.to(shown, { opacity: 1, y: 0, duration: 1.1, ease: "expo.out", stagger: Math.min(0.07, 0.42 / shown.length) });
+        if (shown.length) gsap.to(shown, { opacity: 1, y: 0, duration: 1.1, ease: "expo.out", stagger: Math.min(0.07, 0.42 / shown.length) });
       },
     });
     // titres découpés en lignes qui montent

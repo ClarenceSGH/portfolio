@@ -353,6 +353,25 @@
       "</article>";
   }
 
+  /* ---------- le nom du projet dans la barre du haut ----------
+     Il apparaît à côté de la signature dès que le grand titre passe sous la barre,
+     et disparaît quand on remonte jusqu'au titre. Un clic ramène en haut de l'étude de cas. */
+  function initNavTitle(p) {
+    var link = document.querySelector("[data-nav-project]");
+    var title = document.querySelector(".case__title");
+    if (!link || !title) return;
+    link.innerHTML = "<span>" + esc(p.title) + "</span>";
+    link.setAttribute("aria-label", p.title + ", haut de l'étude de cas");
+    var nav = document.querySelector(".nav");
+    function update() {
+      var navH = nav ? nav.offsetHeight : 0;
+      link.classList.toggle("is-visible", title.getBoundingClientRect().bottom < navH);
+    }
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+  }
+
   /* ---------- couverture en appareils : placée selon la taille du cadre ---------- */
   function initCover() {
     var sc = document.querySelector(".case__cover .scene");
@@ -508,6 +527,7 @@
   if (index === -1) renderNotFound();
   else render(projects[index]);
   initCover();
+  if (index !== -1) initNavTitle(projects[index]);
   PF.start();
   if (index !== -1) {
     if (PF.demos) PF.demos(main);

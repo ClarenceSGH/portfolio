@@ -45,6 +45,8 @@ insécables avant : ; ! ? sont aussi ajoutées toutes seules.
   posés en retrait des bords, comme les scènes des pages projet.
 - **Pages projet** : une fine barre de progression de lecture en haut et, en bas, le projet suivant
   avec un aperçu de sa couverture.
+  Dès que le grand titre sort de l'écran, le nom du projet s'affiche à côté de la signature dans
+  la barre du haut (un clic ramène en haut de l'étude de cas) : on sait toujours où l'on est.
 
 ## Animations
 
