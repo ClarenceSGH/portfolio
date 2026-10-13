@@ -90,7 +90,7 @@ Si tu vois encore une ancienne version : recharge avec Ctrl+F5.
 - [x] Le CV (`assets/CV.pdf`)
 - [x] L'image d'« À propos » : la signature sur un post-it
 - [x] Le parcours (`index.html`, section À propos)
-- [x] Le lien LinkedIn (section Contact de `index.html`)
+- [x] Les liens LinkedIn et Instagram (section Contact de `index.html`)
 - [x] Compétences, logiciels et citation relus (logiciels alignés sur le CV)
 
 ## En ligne (GitHub Pages)
