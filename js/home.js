@@ -1,11 +1,12 @@
 /* ==========================================================
    Page d'accueil
-   1. Arrivée : la signature s'écrit au stylo, s'allume comme un néon,
-      puis rejoint la barre du haut pendant que le rideau se lève.
+   1. Arrivée : sur fond rouge, la signature s'écrit au stylo, puis rejoint
+      la barre du haut pendant que le rideau se lève.
    2. Haut de page : le titre, et un mur incliné des écrans des projets.
    3. Projets empilés : chaque projet arrive en plein cadre (incliné en 3D),
       puis le scroll recadre l'image et fait apparaître ses détails.
-   4. Citation et texte écrits au fil du scroll.
+   4. Vue éclatée d'un écran de chaque projet, qui se rassemble au fil du scroll.
+   5. Citation et texte écrits au fil du scroll.
    ========================================================== */
 (function () {
   var PF = window.PF;
@@ -50,7 +51,6 @@
       return;
     }
 
-    var total = String(projects.length).padStart(2, "0");
     stack.innerHTML = projects
       .map(function (p, i) {
         var url = "projet.html?p=" + encodeURIComponent(p.slug);
@@ -58,7 +58,7 @@
           '<article class="panel" style="--i:' + i + '">' +
             '<div class="panel__inner">' +
               '<div class="panel__stage">' +
-                '<a class="panel__media media" href="' + url + '" tabindex="-1" aria-hidden="true" data-project-link data-cursor="Voir le projet">' +
+                '<a class="panel__media media" href="' + url + '" tabindex="-1" aria-hidden="true" data-project-link>' +
                   (p.scene
                     // couverture en appareils (iPhone, MacBook…) qui se réorganisent au recadrage
                     ? '<div class="panel__media-inner panel__media-inner--scene">' + PF.scene(p, "panel__visual") + "</div>"
@@ -66,20 +66,17 @@
                       (i === 0 ? "" : 'loading="lazy" ') + 'decoding="async"></div>') +
                 "</a>" +
                 '<div class="panel__details">' +
-                  '<p class="panel__meta mono"><b>●</b>' + esc(p.type) + "<span>" + esc(p.year) + "</span></p>" +
+                  '<p class="panel__meta">' + esc(p.type) + ", " + esc(p.year) + "</p>" +
                   '<p class="panel__summary">' + esc(p.summary) + "</p>" +
                   '<dl class="panel__facts">' +
                     "<div><dt>Rôle</dt><dd>" + esc(p.role) + "</dd></div>" +
                     "<div><dt>Cadre</dt><dd>" + esc(p.cadre) + "</dd></div>" +
                     "<div><dt>Outils</dt><dd>" + esc((p.tools || []).join(", ")) + "</dd></div>" +
                   "</dl>" +
-                  '<a class="btn btn--primary" href="' + url + '" data-project-link data-magnetic>Voir l\'étude de cas <i class="ph ph-arrow-right"></i></a>' +
+                  '<a class="btn btn--primary" href="' + url + '" data-project-link>Voir l\'étude de cas <i class="ph ph-arrow-right"></i></a>' +
                 "</div>" +
               "</div>" +
-              '<div class="panel__head">' +
-                '<h3 class="panel__title heading">' + PF.words(p.title) + "</h3>" +
-                '<p class="panel__index mono" aria-hidden="true"><b>' + String(i + 1).padStart(2, "0") + "</b> / " + total + "</p>" +
-              "</div>" +
+              '<h3 class="panel__title heading">' + PF.words(p.title) + "</h3>" +
               '<div class="panel__veil"></div>' +
             "</div>" +
           "</article>"
@@ -105,7 +102,6 @@
   function heroIn() {
     var tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
     tl.fromTo(".hero .line > span", { yPercent: 110, y: 0 }, { yPercent: 0, duration: 1.4, stagger: 0.09 }, 0)
-      .fromTo(".hero__mark path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.9, ease: "power2.inOut" }, 0.85)
       .fromTo("[data-hero-item]", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 1.1, stagger: 0.08 }, 0.5)
       .fromTo(".wall", { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.4, ease: "power2.out" }, 0)
       .fromTo(".wall__move", { z: -500, rotationX: -14, yPercent: 8 }, { z: 0, rotationX: 0, yPercent: 0, duration: 2.4 }, 0)
@@ -170,11 +166,11 @@
 
     var bg = loader.querySelector("[data-loader-bg]");
     var box = loader.querySelector("[data-loader-sig]");
-    var note = loader.querySelector("[data-loader-note]");
-    box.innerHTML = PF.signature({ draw: true }) + '<div class="loader__glow">' + PF.signature() + "</div>";
+    box.innerHTML = PF.signature({ draw: true });
     var svg = box.querySelector("svg");
-    var glow = box.querySelector(".loader__glow");
     var dockTo = document.querySelector(".nav__brand .sig") || document.querySelector(".nav__brand");
+    // la signature prend la couleur du logo (rouge en thème clair, jaune en sombre)
+    var logoColor = getComputedStyle(dockTo).color;
 
     // point d'arrivée : la signature de la barre du haut
     var from = null, to = null;
@@ -184,31 +180,19 @@
     }
 
     var tl = gsap.timeline({ delay: 0.3 });
-    tl.fromTo(note, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: "power2.out" }, 0)
-      .add(PF.writeSignature(svg, { speed: 1100, unmask: true }), 0.15)
-      // le néon s'allume : petits scintillements, puis le halo reste
-      .to(glow, {
-        keyframes: [
-          { opacity: 0.85, duration: 0.05 }, { opacity: 0.1, duration: 0.06 },
-          { opacity: 0.7, duration: 0.05 }, { opacity: 0.25, duration: 0.09 },
-          { opacity: 0.95, duration: 0.3 },
-        ],
-        ease: "none",
-      }, ">-0.02")
-      .to(svg, { keyframes: [{ opacity: 0.55, duration: 0.06 }, { opacity: 1, duration: 0.05 }, { opacity: 0.7, duration: 0.07 }, { opacity: 1, duration: 0.1 }], ease: "none" }, "<")
-      .addLabel("exit", ">+0.35")
+    tl.add(PF.writeSignature(svg, { speed: 1100, unmask: true }), 0)
+      .addLabel("exit", ">+0.45")
       .call(measure, null, "exit")
       // le rideau se lève, la signature rejoint sa place dans la barre
       .to(bg, { yPercent: -100, duration: 1.2, ease: "expo.inOut" }, "exit")
-      .to(note, { autoAlpha: 0, y: -10, duration: 0.45, ease: "power2.in" }, "exit")
       .to(box, {
         x: function () { return to.left - from.left; },
         y: function () { return to.top - from.top; },
         scale: function () { return to.width / from.width; },
+        color: logoColor,
         duration: 1.2,
         ease: "expo.inOut",
       }, "exit")
-      .to(glow, { opacity: 0, duration: 0.9, ease: "power2.out" }, "exit+=0.2")
       .call(function () { if (hero) hero.play(); }, null, "exit+=0.5")
       .call(finish, null, "exit+=1.2");
 
@@ -290,7 +274,6 @@
         gsap.set(p.querySelector(".panel__stage"), { rotationX: 22 });
         gsap.set(p.querySelector(".panel__visual"), { scale: 1.15 });
         gsap.set(p.querySelectorAll(".panel__title .w > span"), { yPercent: 110 });
-        gsap.set(p.querySelector(".panel__index"), { autoAlpha: 0 });
       }
     });
 
@@ -331,11 +314,10 @@
           .fromTo(prev.querySelector(".panel__inner"), { scale: 1 }, { scale: 0.93, duration: 1, immediateRender: false }, "p" + i)
           .to(prev.querySelector(".panel__veil"), { opacity: 0.82, duration: 1 }, "p" + i)
           // le titre précédent s'efface tout de suite : un seul titre lisible à la fois
-          .to([prev.querySelector(".panel__title"), prev.querySelector(".panel__index")], { autoAlpha: 0, duration: 0.3 }, "p" + i)
+          .to(prev.querySelector(".panel__title"), { autoAlpha: 0, duration: 0.3 }, "p" + i)
           .to(p.querySelector(".panel__visual"), { scale: 1, duration: 1 }, "p" + i)
           .to(p.querySelectorAll(".panel__title .w > span"),
-            { yPercent: 0, duration: 0.45, stagger: 0.05, ease: "power3.out" }, "p" + i + "+=0.5")
-          .to(p.querySelector(".panel__index"), { autoAlpha: 1, duration: 0.3 }, "p" + i + "+=0.6");
+            { yPercent: 0, duration: 0.45, stagger: 0.05, ease: "power3.out" }, "p" + i + "+=0.5");
       }
       // les détails : l'image se recadre, les lignes apparaissent une à une
       var sc = scenes[i];
@@ -378,7 +360,11 @@
       if (img.complete) return;
       img.addEventListener("load", function () {
         clearTimeout(refreshTimer);
-        refreshTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 200);
+        refreshTimer = setTimeout(function refresh() {
+          // pas pendant un passage d'étape : le recalcul interromprait le défilement
+          if (PF.stepping && PF.stepping()) { refreshTimer = setTimeout(refresh, 400); return; }
+          ScrollTrigger.refresh();
+        }, 200);
       }, { once: true });
     });
 
@@ -411,6 +397,15 @@
     var engaged = true, busy = false;
     var lastWheel = 0, gestureUsed = false, touchY = null, settleTimer;
     var easeInOut = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+    // pendant un défilement automatique ; libéré à la fin, ou par sécurité après sa durée
+    var busyTimer;
+    function setBusy(seconds) {
+      busy = true;
+      clearTimeout(busyTimer);
+      busyTimer = setTimeout(function () { busy = false; }, (seconds + 0.6) * 1000);
+    }
+    function done() { busy = false; clearTimeout(busyTimer); }
+    PF.stepping = function () { return busy; };
 
     // positions de scroll de chaque étape (recalculées à chaque fois : suit les redimensionnements)
     function stops() {
@@ -432,28 +427,20 @@
       index = Math.max(0, Math.min(s.length - 1, index));
       var y = s[index];
       if (Math.abs(window.scrollY - y) < 2) return;
-      busy = true;
       engaged = true;
       var distance = Math.abs(y - window.scrollY) / window.innerHeight;
-      lenis.scrollTo(y, {
-        duration: duration || Math.min(2, 0.9 + distance * 0.55),
-        easing: easeInOut,
-        lock: true,
-        force: true,
-        onComplete: function () { busy = false; },
-      });
+      var d = duration || Math.min(2, 0.9 + distance * 0.55);
+      setBusy(d);
+      lenis.scrollTo(y, { duration: d, easing: easeInOut, lock: true, force: true, onComplete: done });
     }
 
     function step(dir) {
       var i = current();
       // après le dernier projet : on rend la main au scroll normal
       if (dir > 0 && i === stops().length - 1) {
-        busy = true;
         engaged = false;
-        lenis.scrollTo(last() + window.innerHeight * 0.7, {
-          duration: 1.1, easing: easeInOut, lock: true, force: true,
-          onComplete: function () { busy = false; },
-        });
+        setBusy(1.1);
+        lenis.scrollTo(last() + window.innerHeight * 0.7, { duration: 1.1, easing: easeInOut, lock: true, force: true, onComplete: done });
         return;
       }
       goTo(i + dir);
@@ -542,9 +529,7 @@
     // découpe en mots (insécables) puis en lettres ; texte complet gardé pour les lecteurs d'écran
     var html = text.split(/( +)/).map(function (part) {
       if (/^ +$/.test(part)) return " ";
-      // le mot-clé de la phrase en vert
-      var hl = /^question/.test(part) ? " hl" : "";
-      return '<span class="qw' + hl + '">' + Array.from(part).map(function (c) {
+      return '<span class="qw">' + Array.from(part).map(function (c) {
         return '<span class="qc">' + esc(c) + "</span>";
       }).join("") + "</span>";
     }).join("");
@@ -577,7 +562,18 @@
   var stage = initStack();
   if (!stage) initStaticScenes();
   if (stage) initSteps(stage);
+  // vue éclatée : un écran de chaque projet, l'un après l'autre
+  PF.explode(document.querySelector("[data-explode]"), projects.filter(function (p) { return p.explode; }).map(function (p) {
+    return {
+      data: p.explode,
+      label: p.title + ", " + p.explode.name,
+      url: "projet.html?p=" + encodeURIComponent(p.slug),
+      link: "Voir l'étude de cas " + p.title,
+    };
+  }));
   initQuote();
   initStatement();
   initLoader(hero);
+  // plusieurs sections restent épinglées : on recalcule dans l'ordre de la page
+  if (PF.hasGsap) { ScrollTrigger.sort(); ScrollTrigger.refresh(); }
 })();

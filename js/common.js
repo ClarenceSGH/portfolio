@@ -1,8 +1,8 @@
 /* ==========================================================
    Code partagé par toutes les pages :
-   scroll fluide (Lenis), navigation, signature animée, apparitions
-   au scroll, curseur « Voir le projet », boutons magnétiques,
-   inclinaison 3D des écrans, copie de l'adresse e-mail.
+   scroll fluide (Lenis), navigation, thème clair / sombre,
+   signature animée, apparitions au scroll, inclinaison 3D
+   des écrans, vue éclatée d'un écran, copie de l'adresse e-mail.
    ========================================================== */
 (function () {
   var root = document.documentElement;
@@ -37,12 +37,12 @@
   var reCourt = new RegExp("(^|[\\s\\u00a0'’(«])(" + PETITS + ") (?=\\S)", "giu");
   PF.typo = function (text, full) {
     var t = String(text)
-      .replace(/ ([:;!?»])/g, " $1")
-      .replace(/« /g, "« ")
-      .replace(/ ([–—]) /g, " $1 ")
-      .replace(/Nantes Atlantique/g, "Nantes Atlantique"); // un nom propre ne se coupe pas
+      .replace(/ ([:;!?»])/g, " $1")
+      .replace(/« /g, "« ")
+      .replace(/ ([–—]) /g, " $1 ")
+      .replace(/Nantes Atlantique/g, "Nantes Atlantique"); // un nom propre ne se coupe pas
     if (full === false) return t;
-    for (var i = 0, prev; i < 4 && prev !== t; i++) { prev = t; t = t.replace(reCourt, "$1$2 "); }
+    for (var i = 0, prev; i < 4 && prev !== t; i++) { prev = t; t = t.replace(reCourt, "$1$2 "); }
     return t;
   };
 
@@ -97,23 +97,17 @@
         '<mask id="sig-m' + n + '" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="560">' +
           '<g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">' + pen + "</g>" +
         "</mask>" +
-        '<radialGradient id="sig-g' + n + '">' +
-          '<stop offset="0" stop-color="#ffffff"/><stop offset="0.28" stop-color="#c8ffcc"/>' +
-          '<stop offset="0.6" stop-color="#00ff12" stop-opacity="0.5"/><stop offset="1" stop-color="#00ff12" stop-opacity="0"/>' +
-        "</radialGradient>" +
       "</defs>" +
-      ink + (opts.tip === false ? "" : '<circle class="sig__tip" r="17" fill="url(#sig-g' + n + ')"/>') +
-      "</svg>";
+      ink + "</svg>";
   };
 
-  // Écrit la signature trait par trait : un masque révèle l'encre derrière la pointe du stylo.
+  // Écrit la signature trait par trait : un masque révèle l'encre derrière le stylo.
   // opts.speed : vitesse (unités du dessin par seconde) ; opts.lift : pause entre deux traits ;
   // opts.unmask : à la fin, l'encre est affichée sans masque (net au pixel près).
   PF.writeSignature = function (svg, opts) {
     opts = opts || {};
     var speed = opts.speed || 1150;
     var lift = opts.lift == null ? 0.14 : opts.lift;
-    var tip = svg.querySelector(".sig__tip");
     var ink = svg.querySelector(".sig__ink");
     var tl = gsap.timeline({ paused: !!opts.paused });
     var groups = svg.querySelectorAll("mask [data-stroke]");
@@ -138,20 +132,14 @@
         duration: dur,
         ease: last ? "power1.in" : "sine.inOut",
         onUpdate: function () {
-          var d = prog.v * total, head = null;
+          var d = prog.v * total;
           segs.forEach(function (s) {
             var t = Math.max(0, Math.min(s.len, d));
             s.el.style.strokeDashoffset = t <= 0 ? s.len + 20 : s.len - t;
-            if (!head && d > 0 && d <= s.len) head = s.el.getPointAtLength(t);
             d -= s.len;
           });
-          if (tip && head) { tip.setAttribute("cx", head.x.toFixed(1)); tip.setAttribute("cy", head.y.toFixed(1)); }
         },
       }, start);
-      if (tip) {
-        tl.set(tip, { opacity: 1 }, start);
-        tl.set(tip, { opacity: 0 }, start + dur);
-      }
       at = start + dur;
     });
     if (opts.unmask && ink) {
@@ -166,7 +154,7 @@
   // Logo de la barre du haut : dessin vectoriel ; au survol, la signature se réécrit
   function initBrand() {
     document.querySelectorAll("[data-sig]").forEach(function (a) {
-      a.innerHTML = PF.signature({ draw: PF.animate && fine, tip: false });
+      a.innerHTML = PF.signature({ draw: PF.animate && fine });
       if (!PF.animate || !fine) return;
       var svg = a.querySelector("svg");
       // au départ, signature entière
@@ -176,6 +164,31 @@
         if (PF.locked || (replay && replay.isActive())) return;
         replay = PF.writeSignature(svg, { speed: 2600, lift: 0.04 });
       });
+    });
+  }
+
+  /* Thème clair / sombre : le choix est gardé dans le navigateur
+     (le script du <head> l'applique avant l'affichage, sans flash) */
+  function initTheme() {
+    var btn = document.querySelector("[data-theme-toggle]");
+    if (!btn) return;
+    var meta = document.querySelector('meta[name="theme-color"]');
+    var timer;
+    function sync() {
+      var dark = root.getAttribute("data-theme") === "dark";
+      btn.setAttribute("aria-pressed", String(dark));
+      btn.setAttribute("aria-label", dark ? "Passer au thème clair" : "Passer au thème sombre");
+      if (meta) meta.setAttribute("content", dark ? "#1d1e2c" : "#ddfdfe");
+    }
+    sync();
+    btn.addEventListener("click", function () {
+      var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      root.classList.add("theme-anim");
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("pf-theme", next); } catch (e) {}
+      sync();
+      clearTimeout(timer);
+      timer = setTimeout(function () { root.classList.remove("theme-anim"); }, 500);
     });
   }
 
@@ -310,54 +323,6 @@
   }
 
   /* ---------- Effets de souris (ordinateur seulement) ---------- */
-
-  // Pastille « Voir le projet » qui suit la souris au-dessus des visuels [data-cursor]
-  function initCursor() {
-    if (!fine || !PF.animate) return;
-    var el = document.createElement("div");
-    el.className = "cursor";
-    el.setAttribute("aria-hidden", "true");
-    document.body.appendChild(el);
-    gsap.set(el, { scale: 0.6 });
-    var xTo = gsap.quickTo(el, "x", { duration: 0.45, ease: "power3.out" });
-    var yTo = gsap.quickTo(el, "y", { duration: 0.45, ease: "power3.out" });
-    var current = null;
-    function update(target) {
-      if (target === current) return;
-      current = target;
-      if (target) {
-        el.textContent = target.getAttribute("data-cursor");
-        gsap.to(el, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out", overwrite: "auto" });
-      } else {
-        gsap.to(el, { opacity: 0, scale: 0.6, duration: 0.2, ease: "power2.out", overwrite: "auto" });
-      }
-    }
-    window.addEventListener("pointermove", function (e) {
-      xTo(e.clientX);
-      yTo(e.clientY);
-      update(e.target.closest ? e.target.closest("[data-cursor]") : null);
-    }, { passive: true });
-    document.addEventListener("pointerleave", function () { update(null); });
-    // pendant un défilement, l'élément sous la souris change sans qu'elle bouge
-    window.addEventListener("scroll", function () { if (current) update(null); }, { passive: true });
-  }
-
-  // Boutons magnétiques : ils suivent légèrement la souris
-  function initMagnetic() {
-    if (!fine || !PF.animate) return;
-    document.querySelectorAll("[data-magnetic]").forEach(function (el) {
-      var p = { x: 0, y: 0 };
-      var apply = function () { el.style.translate = p.x.toFixed(2) + "px " + p.y.toFixed(2) + "px"; };
-      var xTo = gsap.quickTo(p, "x", { duration: 0.6, ease: "power3.out", onUpdate: apply });
-      var yTo = gsap.quickTo(p, "y", { duration: 0.6, ease: "power3.out", onUpdate: apply });
-      el.addEventListener("pointermove", function (e) {
-        var r = el.getBoundingClientRect();
-        xTo((e.clientX - (r.left + r.width / 2)) * 0.28);
-        yTo((e.clientY - (r.top + r.height / 2)) * 0.4);
-      });
-      el.addEventListener("pointerleave", function () { xTo(0); yTo(0); });
-    });
-  }
 
   // Inclinaison des appareils d'une scène selon la position de la souris dans "area"
   PF.tiltDevices = function (area, scope) {
@@ -538,6 +503,147 @@
     el.querySelector(".scene__glow").style.transform = tf(v.glow);
   };
 
+  /* ---------- Vue éclatée d'écrans ----------
+     Les calques d'une maquette (exportés de Figma) flottent les uns
+     au-dessus des autres, puis se remettent en place au fil du scroll
+     pour former l'écran. Plusieurs écrans peuvent se suivre (accueil).
+     entries : [{ data, label, url, link }] ; data : "explode" dans js/projects.js. */
+  function explodeStack(data) {
+    var k = 100 / data.screen.w;
+    var u = function (v) { return (v * k).toFixed(2) + "cqw"; };
+    var base = data.base || "";
+    var layers = data.layers.map(function (L) {
+      var inner, top;
+      if (L.plate) {
+        // l'appareil et le fond de l'écran
+        inner = '<div class="explode__body"></div><div class="explode__screen" style="background:' + PF.esc(data.screen.bg) + '"></div>';
+        top = data.screen.h * 0.46;
+      } else {
+        inner = '<div class="explode__sheet"></div>' + L.items.map(function (it) {
+          var pos = "left:" + u(it.x) + ";top:" + u(it.y) + ";width:" + u(it.w);
+          // fond dessiné en CSS (ex. une carte translucide)
+          if (it.box) {
+            return '<div class="explode__piece" style="' + pos + ";height:" + u(it.h) + ";background:" + PF.esc(it.box.bg) +
+              (it.box.border ? ";border:" + PF.esc(it.box.border) : "") + ";border-radius:" + u(it.box.r || 0) + '"></div>';
+          }
+          return '<img src="' + PF.esc(base + it.src) + '" alt="" style="' + pos + '" decoding="async">' +
+            (it.emoji || []).map(function (e) {
+              return '<span class="explode__emoji" style="left:' + u(it.x + e[1]) + ";top:" + u(it.y + e[2]) + '">' + e[0] + "</span>";
+            }).join("");
+        }).join("");
+        top = Math.min.apply(null, L.items.map(function (it) { return it.y; }));
+      }
+      return '<div class="explode__layer' + (L.plate ? " explode__layer--plate" : "") + '">' + inner +
+        '<span class="explode__tag" style="top:' + u(top) + '">' + PF.esc(L.name) + "</span></div>";
+    }).join("");
+    return '<div class="explode__tilt"><div class="explode__stack explode__stack--' + PF.esc(data.device || "phone") +
+      '" style="aspect-ratio:' + data.screen.w + " / " + data.screen.h + '">' + layers + "</div></div>";
+  }
+
+  PF.explode = function (section, entries) {
+    var stage = section && section.querySelector("[data-explode-stage]");
+    entries = (entries || []).filter(function (e) { return e && e.data; });
+    if (!stage || !entries.length) return;
+    var infos = section.querySelector("[data-explode-infos]");
+
+    stage.innerHTML = entries.map(function (e) { return explodeStack(e.data); }).join("");
+    if (infos) {
+      infos.innerHTML = entries.map(function (e, i) {
+        return '<div class="explode__info' + (i ? "" : " is-active") + '">' +
+          (e.label ? '<p class="explode__project">' + PF.esc(PF.typo(e.label)) + "</p>" : "") +
+          '<ol class="explode__layers">' + e.data.layers.map(function (L) { return "<li>" + PF.esc(PF.typo(L.name)) + "</li>"; }).join("") + "</ol>" +
+          (e.url ? '<a class="link explode__link" href="' + PF.esc(e.url) + '">' + PF.esc(PF.typo(e.link || "Voir l'étude de cas")) + ' <i class="ph ph-arrow-right"></i></a>' : "") +
+          "</div>";
+      }).join("");
+    }
+    var tilts = gsap.utils.toArray(stage.querySelectorAll(".explode__tilt"));
+    if (!PF.animate) {
+      tilts.forEach(function (t, i) { if (i) t.style.display = "none"; });
+      return;
+    }
+
+    var stacks = tilts.map(function (tilt, k) {
+      var stack = tilt.querySelector(".explode__stack");
+      return {
+        tilt: tilt,
+        stack: stack,
+        layers: gsap.utils.toArray(stack.querySelectorAll(".explode__layer")),
+        extras: stack.querySelectorAll(".explode__tag, .explode__sheet"),
+        items: infos ? infos.children[k].querySelectorAll("li") : [],
+      };
+    });
+    var blocks = infos ? Array.prototype.slice.call(infos.children) : [];
+    var n = stacks.length;
+    var SEG = 1.5; // part de la timeline consacrée à chaque écran
+    // écart entre deux calques : proportionnel au plus petit côté de l'écran
+    var gap = function (S) { return Math.min(S.stack.offsetWidth, S.stack.offsetHeight) * 0.24; };
+    var active = -1;
+
+    function update() {
+      var a = Math.max(0, Math.min(n - 1, Math.floor((tl.time() + 0.22) / SEG)));
+      if (a !== active) {
+        active = a;
+        blocks.forEach(function (b, i) { b.classList.toggle("is-active", i === a); });
+      }
+      // les calques déjà en place s'allument dans la liste
+      var S = stacks[a];
+      S.layers.forEach(function (el, i) {
+        if (S.items[i]) S.items[i].classList.toggle("is-on", Math.abs(gsap.getProperty(el, "z")) < 2);
+      });
+    }
+
+    // la section reste à l'écran pendant que les écrans se forment
+    var tl = gsap.timeline({
+      defaults: { ease: "none" },
+      scrollTrigger: {
+        trigger: section,
+        start: "top top",
+        end: function () { return "+=" + Math.round(window.innerHeight * (1.5 * n + 0.3)); },
+        pin: true,
+        scrub: 0.6,
+        invalidateOnRefresh: true,
+      },
+      onUpdate: update,
+    });
+    stacks.forEach(function (S, k) {
+      var t0 = k * SEG;
+      // l'écran suivant arrive pendant que le précédent s'en va
+      if (k) {
+        tl.to(stacks[k - 1].tilt, { autoAlpha: 0, yPercent: -16, duration: 0.22, ease: "power2.inOut" }, t0 - 0.34)
+          .fromTo(S.tilt, { autoAlpha: 0, yPercent: 16 }, { autoAlpha: 1, yPercent: 0, duration: 0.3, ease: "power2.out" }, t0 - 0.12);
+      }
+      // vue de trois quarts, comme posée sur une table, puis de face
+      tl.fromTo(S.stack, { rotationX: 56, rotationZ: -34, scale: 0.66, yPercent: 12 },
+        { rotationX: 0, rotationZ: 0, scale: 1, yPercent: 0, duration: 0.9, ease: "power1.inOut" }, t0);
+      // chaque calque redescend à sa place, du fond vers le dessus
+      var m = S.layers.length;
+      S.layers.forEach(function (el, i) {
+        if (!i) return;
+        tl.fromTo(el, { z: function () { return i * gap(S); } }, { z: 0, duration: 0.45, ease: "power2.inOut" }, t0 + 0.06 + (i - 1) * (0.42 / Math.max(1, m - 1)));
+      });
+      tl.to(S.extras, { opacity: 0, duration: 0.25 }, t0 + 0.05);
+    });
+    tl.to({}, { duration: 0.35 }); // un temps d'arrêt sur le dernier écran assemblé
+    update();
+
+    // l'écran se tourne un peu vers la souris
+    if (fine) {
+      var rx = tilts.map(function (t) { return gsap.quickTo(t, "rotationX", { duration: 0.8, ease: "power3.out" }); });
+      var ry = tilts.map(function (t) { return gsap.quickTo(t, "rotationY", { duration: 0.8, ease: "power3.out" }); });
+      section.addEventListener("pointermove", function (e) {
+        var r = stage.getBoundingClientRect();
+        var x = ((e.clientX - r.left) / r.width - 0.5) * 16, y = -((e.clientY - r.top) / r.height - 0.5) * 10;
+        rx.forEach(function (f) { f(y); });
+        ry.forEach(function (f) { f(x); });
+      });
+      section.addEventListener("pointerleave", function () {
+        rx.forEach(function (f) { f(0); });
+        ry.forEach(function (f) { f(0); });
+      });
+    }
+    return tl;
+  };
+
   PF.start = function () {
     PF.typoFix();
     initSmoothScroll();
@@ -546,8 +652,7 @@
     initCopyEmail();
     PF.watchImages();
     PF.initReveals();
-    initCursor();
-    initMagnetic();
+    initTheme();
     initTilt();
     initFooterSig();
     var year = document.querySelector("[data-year]");

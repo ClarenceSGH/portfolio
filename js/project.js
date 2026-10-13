@@ -224,6 +224,23 @@
       return chapter(b) + '<ul class="personas">' + cards + "</ul>";
     },
 
+    // vue éclatée d'un écran : les calques sont dans "explode" du projet
+    explode: function (b) {
+      return (
+        '<section class="explode explode--story" data-explode aria-label="' + esc(b.title || "") + '">' +
+          '<div class="explode__pin">' +
+            '<div class="explode__text">' +
+              (b.kicker ? '<span class="chapter__num">' + esc(b.kicker) + "</span>" : "") +
+              '<h2 class="explode__title heading">' + esc(b.title || "") + "</h2>" +
+              (b.text ? '<p class="explode__lead">' + esc(b.text) + "</p>" : "") +
+              '<div class="explode__infos" data-explode-infos></div>' +
+            "</div>" +
+            '<div class="explode__stage" data-explode-stage aria-hidden="true"></div>' +
+          "</div>" +
+        "</section>"
+      );
+    },
+
     columns: function (b) {
       var cols = b.items
         .map(function (c) {
@@ -291,7 +308,7 @@
       '<article class="case" style="--project:' + esc(p.accent || "var(--accent)") + '">' +
         '<header class="case__head">' +
           '<a class="back link" href="index.html#projets"><i class="ph ph-arrow-left"></i> Retour aux projets</a>' +
-          '<p class="case__type mono"><b>●</b>' + esc(p.type) + (p.year ? "<span>" + esc(p.year) + "</span>" : "") + "</p>" +
+          '<p class="case__type">' + esc(p.type) + (p.year ? ", " + esc(p.year) : "") + "</p>" +
           '<h1 class="case__title heading">' + PF.words(p.title) + "</h1>" +
           '<div class="case__intro">' +
             '<p class="case__summary" data-reveal>' + esc(p.summary) + "</p>" +
@@ -319,7 +336,7 @@
         (projects.length > 1
           ? '<a class="next" href="projet.html?p=' + encodeURIComponent(next.slug) + '">' +
               '<span class="next__inner">' +
-                '<span class="next__label mono">Projet suivant</span>' +
+                '<span class="next__label">Projet suivant</span>' +
                 '<span class="next__title heading">' + esc(next.title) + ' <i class="ph ph-arrow-right"></i></span>' +
               "</span>" +
             "</a>"
@@ -415,20 +432,29 @@
       });
     });
 
-    // Les écrans plus longs que l'appareil (pages de site…) défilent pendant le scroll
+    // Écrans plus longs que l'appareil (pages de site…) : l'appareil reste fixe
+    // à l'écran pendant que la page défile à l'intérieur, puis la lecture reprend
     document.documentElement.classList.add("has-device-scroll");
-    document.querySelectorAll(".story .device__screen > img").forEach(function (img) {
-      var screen = img.parentNode;
-      gsap.to(img, {
-        y: function () { return -Math.max(0, img.offsetHeight - screen.clientHeight); },
-        ease: "none",
+    var navH = function () { var n = document.querySelector(".nav"); return n ? n.offsetHeight : 0; };
+    gsap.utils.toArray(".story .stage--showcase, .story .stage--image").forEach(function (stage) {
+      var imgs = gsap.utils.toArray(stage.querySelectorAll(".device__screen > img"));
+      if (!imgs.length) return;
+      var over = function (img) { return Math.max(0, img.offsetHeight - img.parentNode.clientHeight); };
+      var longest = function () { return Math.max.apply(null, imgs.map(over)); };
+      var tall = function () { return stage.offsetHeight > window.innerHeight - navH() - 24; };
+      var tl = gsap.timeline({
+        defaults: { ease: "none" },
         scrollTrigger: {
-          trigger: img.closest(".device"),
-          start: "top 85%",
-          end: "bottom 20%",
+          trigger: stage,
+          start: function () { return tall() ? "top top+=" + navH() : "center center+=" + Math.round(navH() / 2); },
+          end: function () { return "+=" + Math.round(longest() * 1.4); },
+          pin: true,
           scrub: 0.6,
           invalidateOnRefresh: true,
         },
+      });
+      imgs.forEach(function (img) {
+        tl.to(img, { y: function () { return -over(img); }, duration: 1 }, 0);
       });
     });
 
@@ -474,7 +500,12 @@
   else render(projects[index]);
   initCover();
   PF.start();
+  if (index !== -1) {
+    main.querySelectorAll("[data-explode]").forEach(function (sec) { PF.explode(sec, [{ data: projects[index].explode }]); });
+  }
   initVersions();
   animate();
   refreshOnImages();
+  // plusieurs blocs restent épinglés : on recalcule dans l'ordre de la page
+  if (PF.hasGsap) { ScrollTrigger.sort(); ScrollTrigger.refresh(); }
 })();

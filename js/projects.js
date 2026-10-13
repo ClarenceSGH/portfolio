@@ -23,6 +23,7 @@
      personas  fiches personas
      columns   colonnes de listes (ex. : niveaux d'accès)
      statement grande phrase mise en avant
+     explode   vue éclatée d'un écran (calques dans "explode", voir FISHDEX)
 
    Images : dans assets/projets/<slug>/
    ========================================================== */
@@ -51,6 +52,32 @@ window.PROJECTS = [
     },
     stage: "#272a94",
     accent: "#3236b0",
+    // Vue éclatée de l'écran « Belle prise ! » : calques exportés de Figma,
+    // du fond vers le dessus. x, y, w : position et largeur dans l'écran (375 × 817).
+    explode: {
+      name: "l'écran « Belle prise ! »",
+      device: "phone",
+      base: "assets/projets/fishdex/calques/",
+      screen: { w: 375, h: 817, bg: "#272a94" },
+      layers: [
+        { name: "Fond", plate: true },
+        { name: "En-tête", items: [
+          { src: "fleche.svg", x: 11, y: 40, w: 40 },
+          { src: "titre.svg", x: 43, y: 36, w: 290 },
+          { src: "date.svg", x: 79.3, y: 162.1, w: 217, emoji: [["🕐", 37.4, 0], ["📍", 0, 25.9]] },
+        ] },
+        { name: "Carte", items: [{ src: "carte.svg", x: 36, y: 223, w: 304 }] },
+        { name: "Illustration", items: [{ src: "cercle.svg", x: 73, y: 354, w: 229 }] },
+        { name: "Poissons", items: [
+          { src: "poisson-petit.svg", x: 101.7, y: 367.7, w: 74 },
+          { src: "poisson-petit.svg", x: 227.3, y: 379.3, w: 74 },
+          { src: "poisson-grand.svg", x: 88.9, y: 373.5, w: 203 },
+        ] },
+        { name: "Nom de l'espèce", items: [{ src: "nom.svg", x: 99.6, y: 266, w: 178 }] },
+        { name: "Actions", items: [{ src: "partage.svg", x: 64, y: 623, w: 67 }, { src: "info.svg", x: 137, y: 623, w: 181 }] },
+        { name: "Bouton principal", items: [{ src: "bouton.svg", x: 56, y: 735, w: 264 }] },
+      ],
+    },
     fonts: "family=Climate+Crisis&family=Josefin+Sans:wght@400;700",
     summary:
       "Photographier sa prise, découvrir l'espèce, l'ajouter à sa collection : FISHDEX fait de chaque session de pêche une partie de Pokédex.",
@@ -74,6 +101,11 @@ window.PROJECTS = [
           { src: "assets/projets/fishdex/collection.jpg", alt: "Écran collection : 19 poissons sur 19 débloqués", label: "Collectionner", pos: "top" },
           { src: "assets/projets/fishdex/story.jpg", alt: "Story Instagram générée par l'application", label: "Partager" },
         ],
+      },
+      {
+        t: "explode",
+        title: "Un écran, calque par calque",
+        text: "L'écran « Belle prise ! » démonté : le fond, l'en-tête, la carte, l'illustration, puis les actions. Au fil du scroll, chaque calque reprend sa place.",
       },
       {
         t: "text",
@@ -163,6 +195,21 @@ window.PROJECTS = [
     },
     stage: "#e6e4de",
     accent: "#c63148",
+    // Vue éclatée de l'accueil de la borne (écran 1728 × 1117 dans Figma)
+    explode: {
+      name: "l'accueil de la borne",
+      device: "kiosk",
+      base: "assets/projets/borne-edna/calques/",
+      screen: { w: 1728, h: 1117, bg: "#ffffff" },
+      layers: [
+        { name: "Fond", plate: true },
+        { name: "Barre latérale", items: [{ src: "barre.webp", x: 0, y: 0, w: 115 }] },
+        { name: "Date et heure", items: [{ src: "heure.webp", x: 105, y: 15, w: 162 }] },
+        { name: "Météo", items: [{ src: "meteo.webp", x: 256, y: 133, w: 1360 }] },
+        { name: "Transports", items: [{ src: "transports.webp", x: 256, y: 493, w: 1360 }] },
+        { name: "Agenda", items: [{ src: "agenda.webp", x: 256, y: 853, w: 1360 }] },
+      ],
+    },
     fonts: "family=Montserrat:wght@400;700",
     summary:
       "Une borne pour le hall de L'École de Design Nantes Atlantique : météo, bus et tram, emploi du temps et plan du bâtiment, compris en un coup d'œil.",
@@ -242,6 +289,11 @@ window.PROJECTS = [
         ],
       },
       {
+        t: "explode",
+        title: "L'accueil, calque par calque",
+        text: "L'accueil de la borne démonté : la barre latérale, l'heure, puis les trois cartes météo, transports et agenda. Au fil du scroll, chaque calque reprend sa place.",
+      },
+      {
         t: "palette",
         kicker: "05",
         title: "Un système clair et lisible de loin",
@@ -290,13 +342,33 @@ window.PROJECTS = [
       bg: "linear-gradient(160deg, #26095a 0%, #14043a 50%, #090019 100%)",
       glow: "rgba(94, 1, 254, 0.5)",
       items: [
-        // scroll : le site défile un peu dans l'écran pendant le recadrage
-        { device: "mac", src: "assets/projets/dj-platform/accueil-desktop.jpg", scroll: 0.3, tilt: [10, 12], wide: [730, 500, 1180], narrow: [450, 420, 860], tall: [300, 330, 560] },
-        { device: "iphone", src: "assets/projets/dj-platform/accueil-mobile.jpg", scroll: 0.25, tilt: [6, -22], wide: [1330, 600, 300], narrow: [820, 660, 260], tall: [410, 680, 230] },
+        { device: "mac", src: "assets/projets/dj-platform/accueil-desktop.jpg", tilt: [10, 12], wide: [730, 500, 1180], narrow: [450, 420, 860], tall: [300, 330, 560] },
+        { device: "iphone", src: "assets/projets/dj-platform/accueil-mobile.jpg", tilt: [6, -22], wide: [1330, 600, 300], narrow: [820, 660, 260], tall: [410, 680, 230] },
       ],
     },
     stage: "#0d0322",
     accent: "#5e01fe",
+    // Vue éclatée de la page de recherche (haut de la page, 1512 × 980 dans Figma)
+    explode: {
+      name: "la page de recherche",
+      device: "laptop",
+      base: "assets/projets/dj-platform/calques/",
+      screen: { w: 1512, h: 980, bg: "#0a001b" },
+      layers: [
+        { name: "Fond", plate: true },
+        { name: "Navigateur", items: [{ src: "navigateur.webp", x: 0, y: 0, w: 1512 }] },
+        { name: "Barre de navigation", items: [{ src: "nav.webp", x: 0, y: 118, w: 1512 }] },
+        { name: "Recherche", items: [{ src: "recherche.webp", x: 229, y: 234, w: 1053 }] },
+        { name: "Formulaire", items: [{ box: { bg: "rgba(43, 1, 117, 0.3)", border: "1px solid #d9d9d9", r: 20 }, x: 229, y: 317, w: 1053, h: 659 }] },
+        { name: "Critères", items: [{ src: "criteres.webp", x: 254, y: 352, w: 432 }] },
+        { name: "Calendrier", items: [
+          { src: "calendrier.webp", x: 777, y: 352, w: 457 },
+          { src: "jours.svg", x: 917.8, y: 435.6, w: 301.6 },
+          { src: "apartir.webp", x: 778.6, y: 800.3, w: 143.1 },
+        ] },
+        { name: "Bouton Valider", items: [{ src: "valider.webp", x: 1055, y: 900, w: 178 }] },
+      ],
+    },
     fonts: "family=Saira:wght@400;700",
     summary:
       "Trouver et réserver un DJ à partir du lieu de son événement : une carte des DJ proches, des profils pour comparer, la messagerie et la réservation au même endroit.",
@@ -342,10 +414,9 @@ window.PROJECTS = [
           "Le formulaire reprend les critères qui comptent pour organiser une soirée : type d'événement et de lieu, genres musicaux, équipement en plus, budget maximum, puis la date et l'heure dans un calendrier.",
       },
       {
-        t: "image",
-        device: "mac",
-        src: "assets/projets/dj-platform/recherche.jpg", w: 1512, h: 891,
-        alt: "Formulaire de recherche : type d'événement, lieu, genres, équipement, budget, calendrier et heure",
+        t: "explode",
+        title: "La recherche, calque par calque",
+        text: "La page de recherche démontée : la barre de navigation, la recherche, puis le formulaire, ses critères et le calendrier. Au fil du scroll, chaque calque reprend sa place.",
       },
       {
         t: "text",

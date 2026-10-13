@@ -13,11 +13,12 @@
 | Accueil, À propos, parcours, liens  | `index.html` (cherche les commentaires `<!-- ... -->`) |
 | Couleurs, polices, espacements      | `css/style.css`, tout en haut (`:root`)   |
 | Mon CV                              | remplace `assets/CV.pdf` en gardant ce nom ; les boutons du site le téléchargent sous le nom `CV-Clarence-Seguy-Houel.pdf` |
-| L'image d'« À propos »             | `assets/postit-signature.jpg` (la signature sur un post-it vert fluo collé au mur) ; change le `src` dans `index.html` pour en mettre une autre |
+| L'image d'« À propos »             | `assets/postit-signature.jpg` (la signature sur un post-it jaune collé sur un mur rose) ; change le `src` dans `index.html` pour en mettre une autre |
 | Mon logo (la signature)             | `js/signature.js` : le dessin et les traits du stylo pour l'animation d'écriture ; `assets/signature.svg` : la même signature en image (sans JavaScript). Les fichiers sources sont dans `Visuel/logo/` |
-| Couleurs de l'identité              | `css/style.css`, tout en haut : `--bg` (noir #0c0c0e), `--text` (crème #F4F1EA), `--accent` (vert néon #00FF12) |
+| Couleurs de l'identité              | `css/style.css`, tout en haut : la palette (rouge #BD001E, rose #FAB3A9, jaune #F4D35E, marine #1D1E2C, cyan #DDFDFE), puis les couleurs du thème clair (`:root`) et du thème sombre (`[data-theme="dark"]`) |
+| La vue éclatée des écrans           | calques dans `assets/projets/<slug>/calques/` (exportés de Figma), réglages dans `explode` de chaque projet (`js/projects.js`) |
 | Le mur d'écrans du haut de page     | miniatures dans `assets/mur/`, liste en haut de `js/home.js` (`WALL`) |
-| La ligne « Recherche un stage… »   | `index.html`, juste au-dessus du grand titre |
+| La phrase « Je recherche un stage… » | `index.html`, dernière phrase sous le grand titre |
 
 Les images de projets vont dans `assets/projets/<slug>/` (un dossier par projet).
 La page d'un projet se construit avec la liste `story` de `js/projects.js` : une suite de blocs
@@ -33,8 +34,8 @@ insécables avant : ; ! ? sont aussi ajoutées toutes seules.
 
 ## Animations
 
-Arrivée sur le site : la signature s'écrit au stylo, s'allume comme un néon, puis rejoint
-le centre de la barre du haut pendant que le rideau noir se lève sur le haut de page.
+Arrivée sur le site : sur fond rouge, la signature s'écrit au stylo, puis rejoint le centre
+de la barre du haut pendant que le rideau se lève sur le haut de page.
 Un geste (molette, clic, touche) pendant l'écriture l'accélère. L'animation ne se rejoue pas
 quand on revient d'une page projet (elle se rejoue si on recharge la page).
 Au survol, la signature de la barre du haut se réécrit ; en bas de chaque page, elle s'écrit en grand.
@@ -46,6 +47,18 @@ Navigation par étapes : sur l'accueil, un seul geste (cran de molette, glisseme
 flèche ↓ ou ↑ du clavier) passe du haut de page au premier projet, puis d'un projet à l'autre ;
 l'animation se joue toute seule. Chaque projet arrive incliné, comme un écran que l'on redresse.
 Après le dernier projet, le scroll redevient normal.
+
+Vue éclatée : après les projets, un écran de chaque projet (FISHDEX, la borne, DJ Platform)
+arrive en calques séparés qui flottent en 3D, puis se rassemblent au fil du scroll pour former
+l'interface. La même vue se trouve dans chaque page projet. Pour en ajouter un, exporte les
+calques depuis Figma dans `assets/projets/<slug>/calques/` et décris-les dans `explode`
+(position x, y et largeur w de chaque calque dans l'écran Figma).
+
+Pages projet : quand une page de site défile dans un écran (MacBook, iPhone), l'appareil reste
+fixe à l'écran le temps que la page défile, puis la lecture reprend.
+
+Thème clair / sombre : le bouton lune / soleil de la barre du haut. Le choix est gardé ;
+sans choix, le site suit le réglage de l'ordinateur.
 
 Couvertures des projets : les écrans sont posés sur des iPhone et MacBook dessinés en CSS,
 inclinés en 3D (réglage `tilt` de chaque appareil dans `js/projects.js`) ; sur ordinateur,

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Étude de cas | Clarence Seguy-Houel</title>
   <meta name="description" content="Étude de cas UX/UI par Clarence Seguy-Houel.">
-  <meta name="theme-color" content="#0c0c0e">
+  <meta name="theme-color" content="#ddfdfe">
 
   <!-- Icône du site (onglet, favoris, écran d'accueil du téléphone) -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
@@ -16,7 +16,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Geist:wght@300..700&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
   <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.20/dist/lenis.css">
   <link rel="stylesheet" href="css/style.css">
@@ -24,8 +24,16 @@
   <script>
     // .js : les scripts tournent. .motion : animations complètes, toujours activées
     // (même si l'ordinateur demande de réduire les animations).
-    document.documentElement.classList.add("js", "motion");
-    setTimeout(function () { if (!window.PF) document.documentElement.classList.remove("js"); }, 3000);
+    // data-theme : thème clair ou sombre (choix gardé, sinon celui de l'ordinateur).
+    (function (h) {
+      h.classList.add("js", "motion");
+      var theme = null;
+      try { theme = localStorage.getItem("pf-theme"); } catch (e) {}
+      if (theme !== "dark" && theme !== "light") theme = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      h.setAttribute("data-theme", theme);
+      if (theme === "dark") document.querySelector('meta[name="theme-color"]').setAttribute("content", "#1d1e2c");
+      setTimeout(function () { if (!window.PF) h.classList.remove("js"); }, 3000);
+    })(document.documentElement);
   </script>
 </head>
 <body>
@@ -33,15 +41,16 @@
 
   <nav class="nav" data-nav aria-label="Navigation principale">
     <ul class="nav__list">
-      <li><a href="index.html#projets"><span class="roll"><span data-text="Projets">Projets</span></span></a></li>
-      <li><a href="index.html#a-propos"><span class="roll"><span data-text="À propos">À propos</span></span></a></li>
+      <li><a href="index.html#projets">Projets</a></li>
+      <li><a href="index.html#a-propos">À propos</a></li>
     </ul>
     <!-- la signature (logo) : remplacée par un dessin vectoriel animable au chargement -->
     <a class="nav__brand" href="index.html" aria-label="Clarence Seguy-Houel, accueil" data-sig>
       <img src="assets/signature.svg" alt="" width="581" height="492">
     </a>
     <ul class="nav__list nav__list--right">
-      <li><a href="index.html#contact"><span class="roll"><span data-text="Contact">Contact</span></span></a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li><button class="theme-toggle" type="button" data-theme-toggle aria-label="Changer de thème"><i class="ph ph-moon" aria-hidden="true"></i><i class="ph ph-sun" aria-hidden="true"></i></button></li>
     </ul>
   </nav>
 
@@ -49,7 +58,7 @@
   <main id="contenu" data-case></main>
 
   <footer class="footer">
-    <!-- la signature s'écrit en grand au fil du scroll -->
+    <!-- la signature s'écrit quand on arrive en bas de la page -->
     <div class="footer__sig" data-footer-sig aria-hidden="true"></div>
     <div class="footer__bar">
       <p>© <span data-year>2026</span> Clarence Seguy-Houel</p>
