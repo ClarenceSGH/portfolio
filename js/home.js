@@ -5,8 +5,7 @@
    2. Haut de page : le titre, et un mur incliné des écrans des projets.
    3. Projets empilés : chaque projet arrive en plein cadre (incliné en 3D),
       puis le scroll recadre l'image et fait apparaître ses détails.
-   4. Présentations animées des trois projets (js/demos.js).
-   5. Citation et texte écrits au fil du scroll.
+   4. Citation et texte écrits au fil du scroll.
    ========================================================== */
 (function () {
   var PF = window.PF;
@@ -562,8 +561,6 @@
   var stage = initStack();
   if (!stage) initStaticScenes();
   if (stage) initSteps(stage);
-  // présentations animées des trois projets (js/demos.js)
-  if (PF.demos) PF.demos();
   initQuote();
   initStatement();
   initLoader(hero);

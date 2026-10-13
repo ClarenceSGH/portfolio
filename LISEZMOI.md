@@ -50,8 +50,8 @@ l'animation se joue toute seule. Chaque projet glisse par-dessus le précédent,
 puis se redresse.
 Après le dernier projet, le scroll redevient normal.
 
-Projets en mouvement : après les projets, chaque projet a sa présentation animée, pilotée
-par le scroll (`js/demos.js`). La même se trouve dans sa page projet (bloc `demo`).
+Projets en mouvement : dans chaque page projet, une présentation animée pilotée par le scroll
+(bloc `demo` de la liste `story`, animation dans `js/demos.js`). Elle n'est pas sur l'accueil.
 - FISHDEX : les composants de l'écran « Belle prise ! » sont éparpillés sur un canevas
   façon Figma ; la souris « Clarence » les attrape un à un et les remet dans le téléphone.
   Le dernier, le grand poisson, se pêche : la souris saisit une canne, ferre le poisson et le
