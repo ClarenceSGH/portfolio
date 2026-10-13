@@ -1,22 +1,25 @@
 /* ==========================================================
    Code partagé par toutes les pages :
-   scroll fluide (Lenis), navigation, apparitions au scroll,
-   chargement des images, copie de l'adresse e-mail.
+   scroll fluide (Lenis), navigation, signature animée, apparitions
+   au scroll, curseur « Voir le projet », boutons magnétiques,
+   inclinaison 3D des écrans, copie de l'adresse e-mail.
    ========================================================== */
 (function () {
   var root = document.documentElement;
   // Animations complètes quand le script du <head> a posé .motion (toujours le cas).
   var reduce = !root.classList.contains("motion");
   var hasGsap = !!(window.gsap && window.ScrollTrigger);
+  // souris (et pas écran tactile) : effets de survol
+  var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   // Sans GSAP, on affiche tout directement.
-  if (!hasGsap) root.classList.remove("js");
+  if (!hasGsap) root.classList.remove("js", "is-loading");
   else {
     gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.config({ ignoreMobileResize: true });
   }
 
-  var PF = (window.PF = { reduce: reduce, hasGsap: hasGsap, animate: hasGsap && !reduce, lenis: null });
+  var PF = (window.PF = { reduce: reduce, hasGsap: hasGsap, animate: hasGsap && !reduce, fine: fine, lenis: null, locked: false });
 
   /* Échappe le texte avant de l'insérer dans le HTML */
   PF.esc = function (str) {
@@ -34,12 +37,12 @@
   var reCourt = new RegExp("(^|[\\s\\u00a0'’(«])(" + PETITS + ") (?=\\S)", "giu");
   PF.typo = function (text, full) {
     var t = String(text)
-      .replace(/ ([:;!?»])/g, " $1")
-      .replace(/« /g, "« ")
-      .replace(/ ([–—]) /g, " $1 ")
-      .replace(/Nantes Atlantique/g, "Nantes Atlantique"); // un nom propre ne se coupe pas
+      .replace(/ ([:;!?»])/g, " $1")
+      .replace(/« /g, "« ")
+      .replace(/ ([–—]) /g, " $1 ")
+      .replace(/Nantes Atlantique/g, "Nantes Atlantique"); // un nom propre ne se coupe pas
     if (full === false) return t;
-    for (var i = 0, prev; i < 4 && prev !== t; i++) { prev = t; t = t.replace(reCourt, "$1$2 "); }
+    for (var i = 0, prev; i < 4 && prev !== t; i++) { prev = t; t = t.replace(reCourt, "$1$2 "); }
     return t;
   };
 
@@ -70,6 +73,112 @@
       .join(" ");
   };
 
+  /* ---------- Signature (logo) ----------
+     PF.signature()            : le dessin, en vert (couleur du texte courant)
+     PF.signature({ draw: 1 }) : avec le masque qui permet de l'écrire au stylo
+     PF.writeSignature(svg)    : animation d'écriture (timeline GSAP) */
+  var sigCount = 0;
+  PF.signature = function (opts) {
+    opts = opts || {};
+    var S = window.SIGNATURE;
+    if (!S) return "";
+    var n = ++sigCount;
+    var ink = '<path class="sig__ink" fill="currentColor" fill-rule="evenodd" d="' + S.d + '"' +
+      (opts.draw ? ' mask="url(#sig-m' + n + ')"' : "") + "/>";
+    var open = '<svg class="sig" viewBox="' + S.box + '" aria-hidden="true" focusable="false">';
+    if (!opts.draw) return open + ink + "</svg>";
+    var pen = S.pen.map(function (stroke, i) {
+      return '<g data-stroke="' + i + '">' + stroke.map(function (s) {
+        return '<path d="' + s.d + '" stroke-width="' + s.w + '"/>';
+      }).join("") + "</g>";
+    }).join("");
+    return open +
+      "<defs>" +
+        '<mask id="sig-m' + n + '" maskUnits="userSpaceOnUse" x="0" y="0" width="640" height="560">' +
+          '<g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">' + pen + "</g>" +
+        "</mask>" +
+        '<radialGradient id="sig-g' + n + '">' +
+          '<stop offset="0" stop-color="#ffffff"/><stop offset="0.28" stop-color="#c8ffcc"/>' +
+          '<stop offset="0.6" stop-color="#00ff12" stop-opacity="0.5"/><stop offset="1" stop-color="#00ff12" stop-opacity="0"/>' +
+        "</radialGradient>" +
+      "</defs>" +
+      ink + (opts.tip === false ? "" : '<circle class="sig__tip" r="17" fill="url(#sig-g' + n + ')"/>') +
+      "</svg>";
+  };
+
+  // Écrit la signature trait par trait : un masque révèle l'encre derrière la pointe du stylo.
+  // opts.speed : vitesse (unités du dessin par seconde) ; opts.lift : pause entre deux traits ;
+  // opts.unmask : à la fin, l'encre est affichée sans masque (net au pixel près).
+  PF.writeSignature = function (svg, opts) {
+    opts = opts || {};
+    var speed = opts.speed || 1150;
+    var lift = opts.lift == null ? 0.14 : opts.lift;
+    var tip = svg.querySelector(".sig__tip");
+    var ink = svg.querySelector(".sig__ink");
+    var tl = gsap.timeline({ paused: !!opts.paused });
+    var groups = svg.querySelectorAll("mask [data-stroke]");
+    var at = 0;
+    if (ink && !ink.getAttribute("mask") && ink.getAttribute("data-mask")) ink.setAttribute("mask", ink.getAttribute("data-mask"));
+
+    groups.forEach(function (g, gi) {
+      var segs = Array.prototype.map.call(g.querySelectorAll("path"), function (p) {
+        var len = p.getTotalLength();
+        p.style.strokeDasharray = len + " " + (len + 40);
+        p.style.strokeDashoffset = len + 20; // caché
+        return { el: p, len: len };
+      });
+      var total = segs.reduce(function (s, x) { return s + x.len; }, 0);
+      var last = gi === groups.length - 1;
+      // le dernier trait (le grand trait de soulignement) part plus vite, comme un geste final
+      var dur = Math.max(0.25, total / (speed * (last ? 1.6 : 1)));
+      var prog = { v: 0 };
+      var start = at + (gi ? lift : 0);
+      tl.to(prog, {
+        v: 1,
+        duration: dur,
+        ease: last ? "power1.in" : "sine.inOut",
+        onUpdate: function () {
+          var d = prog.v * total, head = null;
+          segs.forEach(function (s) {
+            var t = Math.max(0, Math.min(s.len, d));
+            s.el.style.strokeDashoffset = t <= 0 ? s.len + 20 : s.len - t;
+            if (!head && d > 0 && d <= s.len) head = s.el.getPointAtLength(t);
+            d -= s.len;
+          });
+          if (tip && head) { tip.setAttribute("cx", head.x.toFixed(1)); tip.setAttribute("cy", head.y.toFixed(1)); }
+        },
+      }, start);
+      if (tip) {
+        tl.set(tip, { opacity: 1 }, start);
+        tl.set(tip, { opacity: 0 }, start + dur);
+      }
+      at = start + dur;
+    });
+    if (opts.unmask && ink) {
+      tl.call(function () {
+        ink.setAttribute("data-mask", ink.getAttribute("mask") || "");
+        ink.removeAttribute("mask");
+      });
+    }
+    return tl;
+  };
+
+  // Logo de la barre du haut : dessin vectoriel ; au survol, la signature se réécrit
+  function initBrand() {
+    document.querySelectorAll("[data-sig]").forEach(function (a) {
+      a.innerHTML = PF.signature({ draw: PF.animate && fine, tip: false });
+      if (!PF.animate || !fine) return;
+      var svg = a.querySelector("svg");
+      // au départ, signature entière
+      svg.querySelectorAll("mask path").forEach(function (p) { p.style.strokeDasharray = "none"; });
+      var replay = null;
+      a.addEventListener("mouseenter", function () {
+        if (PF.locked || (replay && replay.isActive())) return;
+        replay = PF.writeSignature(svg, { speed: 2600, lift: 0.04 });
+      });
+    });
+  }
+
   /* Scroll fluide */
   function initSmoothScroll() {
     if (!PF.animate || !window.Lenis) return;
@@ -84,6 +193,7 @@
       var link = e.target.closest('a[href^="#"]');
       if (!link || link.classList.contains("skip")) return;
       var hash = link.getAttribute("href");
+      if (PF.locked) { e.preventDefault(); return; }
       // la page peut gérer elle-même certains liens (ex. navigation par étapes)
       if (PF.anchorHandler && PF.anchorHandler(hash)) {
         e.preventDefault();
@@ -135,9 +245,22 @@
       start: "top 88%",
       once: true,
       onEnter: function (batch) {
-        batch.forEach(function (el) { el.classList.add("is-revealed"); });
-        gsap.to(batch, { opacity: 1, y: 0, duration: 1, ease: "power3.out", stagger: 0.08 });
+        // après un saut (lien, retour), ce qui est déjà passé au-dessus s'affiche tout de suite
+        var shown = [], past = [];
+        batch.forEach(function (el) {
+          el.classList.add("is-revealed");
+          (el.getBoundingClientRect().bottom < 0 ? past : shown).push(el);
+        });
+        if (past.length) gsap.set(past, { opacity: 1, y: 0 });
+        gsap.to(shown, { opacity: 1, y: 0, duration: 1.1, ease: "expo.out", stagger: Math.min(0.07, 0.42 / shown.length) });
       },
+    });
+    // titres découpés en lignes qui montent
+    gsap.utils.toArray("[data-split-lines]").forEach(function (el) {
+      gsap.fromTo(el.querySelectorAll(".line > span"), { yPercent: 110, y: 0 }, {
+        yPercent: 0, duration: 1.3, ease: "expo.out", stagger: 0.1,
+        scrollTrigger: { trigger: el, start: "top 85%", once: true },
+      });
     });
   };
 
@@ -186,11 +309,122 @@
     }
   }
 
+  /* ---------- Effets de souris (ordinateur seulement) ---------- */
+
+  // Pastille « Voir le projet » qui suit la souris au-dessus des visuels [data-cursor]
+  function initCursor() {
+    if (!fine || !PF.animate) return;
+    var el = document.createElement("div");
+    el.className = "cursor";
+    el.setAttribute("aria-hidden", "true");
+    document.body.appendChild(el);
+    gsap.set(el, { scale: 0.6 });
+    var xTo = gsap.quickTo(el, "x", { duration: 0.45, ease: "power3.out" });
+    var yTo = gsap.quickTo(el, "y", { duration: 0.45, ease: "power3.out" });
+    var current = null;
+    function update(target) {
+      if (target === current) return;
+      current = target;
+      if (target) {
+        el.textContent = target.getAttribute("data-cursor");
+        gsap.to(el, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out", overwrite: "auto" });
+      } else {
+        gsap.to(el, { opacity: 0, scale: 0.6, duration: 0.2, ease: "power2.out", overwrite: "auto" });
+      }
+    }
+    window.addEventListener("pointermove", function (e) {
+      xTo(e.clientX);
+      yTo(e.clientY);
+      update(e.target.closest ? e.target.closest("[data-cursor]") : null);
+    }, { passive: true });
+    document.addEventListener("pointerleave", function () { update(null); });
+    // pendant un défilement, l'élément sous la souris change sans qu'elle bouge
+    window.addEventListener("scroll", function () { if (current) update(null); }, { passive: true });
+  }
+
+  // Boutons magnétiques : ils suivent légèrement la souris
+  function initMagnetic() {
+    if (!fine || !PF.animate) return;
+    document.querySelectorAll("[data-magnetic]").forEach(function (el) {
+      var p = { x: 0, y: 0 };
+      var apply = function () { el.style.translate = p.x.toFixed(2) + "px " + p.y.toFixed(2) + "px"; };
+      var xTo = gsap.quickTo(p, "x", { duration: 0.6, ease: "power3.out", onUpdate: apply });
+      var yTo = gsap.quickTo(p, "y", { duration: 0.6, ease: "power3.out", onUpdate: apply });
+      el.addEventListener("pointermove", function (e) {
+        var r = el.getBoundingClientRect();
+        xTo((e.clientX - (r.left + r.width / 2)) * 0.28);
+        yTo((e.clientY - (r.top + r.height / 2)) * 0.4);
+      });
+      el.addEventListener("pointerleave", function () { xTo(0); yTo(0); });
+    });
+  }
+
+  // Inclinaison des appareils d'une scène selon la position de la souris dans "area"
+  PF.tiltDevices = function (area, scope) {
+    if (!fine || !PF.animate || !area) return;
+    var devices = (scope || area).querySelectorAll(".scene__item > .device");
+    if (!devices.length) return;
+    var target = { x: 0, y: 0 }, cur = { x: 0, y: 0 }, running = false;
+    function tick() {
+      cur.x += (target.x - cur.x) * 0.08;
+      cur.y += (target.y - cur.y) * 0.08;
+      devices.forEach(function (d) {
+        d.style.setProperty("--mx", cur.x.toFixed(4));
+        d.style.setProperty("--my", cur.y.toFixed(4));
+        d.style.setProperty("--sheen", (60 - cur.x * 30).toFixed(1) + "%");
+      });
+      if (Math.abs(target.x - cur.x) + Math.abs(target.y - cur.y) > 0.001) requestAnimationFrame(tick);
+      else running = false;
+    }
+    function go() { if (!running) { running = true; requestAnimationFrame(tick); } }
+    area.addEventListener("pointermove", function (e) {
+      var r = area.getBoundingClientRect();
+      target.x = ((e.clientX - r.left) / r.width - 0.5) * 2;
+      target.y = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      go();
+    });
+    area.addEventListener("pointerleave", function () { target.x = 0; target.y = 0; go(); });
+  };
+
+  // Image inclinée en 3D sous la souris [data-tilt]
+  function initTilt() {
+    if (!fine || !PF.animate) return;
+    document.querySelectorAll("[data-tilt]").forEach(function (box) {
+      var el = box.firstElementChild;
+      gsap.set(el, { transformPerspective: 1100 });
+      var rx = gsap.quickTo(el, "rotationX", { duration: 0.8, ease: "power3.out" });
+      var ry = gsap.quickTo(el, "rotationY", { duration: 0.8, ease: "power3.out" });
+      box.addEventListener("pointermove", function (e) {
+        var r = box.getBoundingClientRect();
+        ry(((e.clientX - r.left) / r.width - 0.5) * 14);
+        rx(-((e.clientY - r.top) / r.height - 0.5) * 12);
+      });
+      box.addEventListener("pointerleave", function () { rx(0); ry(0); });
+    });
+  }
+
+  /* Pied de page : la grande signature s'écrit quand elle arrive à l'écran
+     (et se réécrit si l'on remonte puis redescend) */
+  function initFooterSig() {
+    var box = document.querySelector("[data-footer-sig]");
+    if (!box) return;
+    box.innerHTML = PF.signature({ draw: PF.animate });
+    if (!PF.animate) return;
+    var tl = PF.writeSignature(box.querySelector("svg"), { paused: true, speed: 900 });
+    ScrollTrigger.create({
+      trigger: box,
+      start: "top 70%",
+      onEnter: function () { tl.restart(); },
+      onLeaveBack: function () { tl.pause(0); },
+    });
+  }
+
   /* ---------- Appareils : iPhone, MacBook, écran tactile ----------
      PF.device("iphone" | "mac" | "screen" | "free", src, alt, options)
      options.media : fondu au chargement ; options.pos : cadrage de l'image ;
      options.scroll : part de l'écran qui défile pendant le recadrage (accueil) ;
-     options.mask : masque de transparence (image détourée) */
+     options.mask : masque de transparence (image détourée) ;
+     options.tilt : [inclinaison avant/arrière, inclinaison gauche/droite] en degrés */
   PF.device = function (type, src, alt, opts) {
     opts = opts || {};
     var style = (opts.pos ? "object-position:" + PF.esc(opts.pos) + ";" : "") +
@@ -200,17 +434,18 @@
       (style ? ' style="' + style + '"' : "") +
       (opts.lazy ? ' loading="lazy"' : "") +
       (opts.scroll ? ' data-scroll="' + Number(opts.scroll) + '"' : "") + ' decoding="async">';
+    var tilt = opts.tilt ? ' style="--rx:' + Number(opts.tilt[0]) + "deg;--ry:" + Number(opts.tilt[1]) + 'deg"' : "";
     var screen = '<div class="device__screen' + (opts.media ? " media" : "") + '">' + img + "</div>";
     if (type === "iphone") {
-      return '<div class="device device--iphone"><div class="iphone">' + screen +
+      return '<div class="device device--iphone"' + tilt + '><div class="iphone">' + screen +
         '<span class="iphone__island" aria-hidden="true"></span></div></div>';
     }
     if (type === "mac") {
-      return '<div class="device device--mac"><div class="mac"><div class="mac__lid">' + screen +
+      return '<div class="device device--mac"' + tilt + '><div class="mac"><div class="mac__lid">' + screen +
         '<span class="mac__notch" aria-hidden="true"></span></div><div class="mac__base" aria-hidden="true"></div></div></div>';
     }
-    if (type === "screen") return '<div class="device device--screen"><div class="display">' + screen + "</div></div>";
-    return '<div class="device device--free">' + img + "</div>"; // image détourée (ex. la borne)
+    if (type === "screen") return '<div class="device device--screen"' + tilt + '><div class="display">' + screen + "</div></div>";
+    return '<div class="device device--free"' + tilt + ">" + img + "</div>"; // image détourée (ex. la borne)
   };
 
   /* ---------- Scènes : les appareils d'une couverture ----------
@@ -229,7 +464,8 @@
   PF.scene = function (p, extraClass) {
     var items = p.scene.items
       .map(function (it, i) {
-        return '<div class="scene__item" data-i="' + i + '">' + PF.device(it.device, it.src, "", { scroll: it.scroll, mask: it.mask }) + "</div>";
+        return '<div class="scene__item" data-i="' + i + '">' +
+          PF.device(it.device, it.src, "", { scroll: it.scroll, mask: it.mask, tilt: it.tilt }) + "</div>";
       })
       .join("");
     return '<div class="scene ' + (extraClass || "") + '" data-scene="' + PF.esc(p.slug) + '" style="background:' +
@@ -305,10 +541,15 @@
   PF.start = function () {
     PF.typoFix();
     initSmoothScroll();
+    initBrand();
     initNav();
     initCopyEmail();
     PF.watchImages();
     PF.initReveals();
+    initCursor();
+    initMagnetic();
+    initTilt();
+    initFooterSig();
     var year = document.querySelector("[data-year]");
     if (year) year.textContent = new Date().getFullYear();
     if (hasGsap && document.fonts) document.fonts.ready.then(function () { ScrollTrigger.refresh(); });

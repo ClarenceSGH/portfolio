@@ -8,6 +8,7 @@
 
    Appareils (device) : "iphone", "mac" (MacBook), "screen" (écran
    tactile, pour la borne) ou "free" (image détourée).
+   tilt : [avant/arrière, gauche/droite] inclinaison 3D en degrés (facultatif).
 
    La page projet est construite à partir de "story" : une
    suite de blocs qui s'affichent dans l'ordre. Types de blocs :
@@ -43,9 +44,9 @@ window.PROJECTS = [
       bg: "linear-gradient(160deg, #3438b4 0%, #23258a 55%, #181a66 100%)",
       glow: "rgba(110, 118, 255, 0.55)",
       items: [
-        { device: "iphone", src: "assets/projets/fishdex/collection.jpg", wide: [330, 530, 400], narrow: [255, 540, 340, -8], tall: [152, 565, 230, -6] },
-        { device: "iphone", src: "assets/projets/fishdex/story.jpg", wide: [1270, 530, 400], narrow: [745, 540, 340, 8], tall: [448, 565, 230, 6] },
-        { device: "iphone", src: "assets/projets/fishdex/belle-prise.jpg", wide: [800, 480, 400], narrow: [500, 500, 410], tall: [300, 480, 330] },
+        { device: "iphone", src: "assets/projets/fishdex/collection.jpg", tilt: [6, 24], wide: [330, 530, 400], narrow: [255, 540, 340, -8], tall: [152, 565, 230, -6] },
+        { device: "iphone", src: "assets/projets/fishdex/story.jpg", tilt: [6, -24], wide: [1270, 530, 400], narrow: [745, 540, 340, 8], tall: [448, 565, 230, 6] },
+        { device: "iphone", src: "assets/projets/fishdex/belle-prise.jpg", tilt: [10, 0], wide: [800, 480, 400], narrow: [500, 500, 410], tall: [300, 480, 330] },
       ],
     },
     stage: "#272a94",
@@ -155,8 +156,8 @@ window.PROJECTS = [
       bg: "linear-gradient(170deg, #f1f0ec 0%, #e4e2dc 60%, #d9d7d0 100%)",
       glow: "rgba(255, 255, 255, 0.85)",
       items: [
-        { device: "screen", src: "assets/projets/borne-edna/semaine.jpg", wide: [445, 440, 680], narrow: [290, 380, 520], tall: [250, 215, 440] },
-        { device: "screen", src: "assets/projets/borne-edna/version-3.jpg", wide: [1155, 440, 680], narrow: [710, 380, 520], tall: [350, 275, 440] },
+        { device: "screen", src: "assets/projets/borne-edna/semaine.jpg", tilt: [4, 22], wide: [445, 440, 680], narrow: [290, 380, 520], tall: [250, 215, 440] },
+        { device: "screen", src: "assets/projets/borne-edna/version-3.jpg", tilt: [4, -22], wide: [1155, 440, 680], narrow: [710, 380, 520], tall: [350, 275, 440] },
         { device: "free", src: "assets/projets/borne-edna/borne.jpg", mask: "assets/projets/borne-edna/borne-masque.png", wide: [800, 560, 560], narrow: [500, 560, 560], tall: [300, 650, 430] },
       ],
     },
@@ -290,8 +291,8 @@ window.PROJECTS = [
       glow: "rgba(94, 1, 254, 0.5)",
       items: [
         // scroll : le site défile un peu dans l'écran pendant le recadrage
-        { device: "mac", src: "assets/projets/dj-platform/accueil-desktop.jpg", scroll: 0.3, wide: [730, 500, 1180], narrow: [450, 420, 860], tall: [300, 330, 560] },
-        { device: "iphone", src: "assets/projets/dj-platform/accueil-mobile.jpg", scroll: 0.25, wide: [1330, 600, 300], narrow: [820, 660, 260], tall: [410, 680, 230] },
+        { device: "mac", src: "assets/projets/dj-platform/accueil-desktop.jpg", scroll: 0.3, tilt: [10, 12], wide: [730, 500, 1180], narrow: [450, 420, 860], tall: [300, 330, 560] },
+        { device: "iphone", src: "assets/projets/dj-platform/accueil-mobile.jpg", scroll: 0.25, tilt: [6, -22], wide: [1330, 600, 300], narrow: [820, 660, 260], tall: [410, 680, 230] },
       ],
     },
     stage: "#0d0322",

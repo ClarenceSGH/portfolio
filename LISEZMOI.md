@@ -13,8 +13,11 @@
 | Accueil, À propos, parcours, liens  | `index.html` (cherche les commentaires `<!-- ... -->`) |
 | Couleurs, polices, espacements      | `css/style.css`, tout en haut (`:root`)   |
 | Mon CV                              | remplace `assets/CV.pdf` en gardant ce nom ; les boutons du site le téléchargent sous le nom `CV-Clarence-Seguy-Houel.pdf` |
-| L'image d'« À propos »             | `assets/postit-logo.jpg` (le logo sur un post-it collé au mur) ; change le `src` dans `index.html` pour en mettre une autre |
-| Mon logo                            | `assets/logo.png` (grande taille) et `assets/logo-bold.png` (trait épaissi pour la petite taille dans la barre du haut) |
+| L'image d'« À propos »             | `assets/postit-signature.jpg` (la signature sur un post-it vert fluo collé au mur) ; change le `src` dans `index.html` pour en mettre une autre |
+| Mon logo (la signature)             | `js/signature.js` : le dessin et les traits du stylo pour l'animation d'écriture ; `assets/signature.svg` : la même signature en image (sans JavaScript). Les fichiers sources sont dans `Visuel/logo/` |
+| Couleurs de l'identité              | `css/style.css`, tout en haut : `--bg` (noir #0c0c0e), `--text` (crème #F4F1EA), `--accent` (vert néon #00FF12) |
+| Le mur d'écrans du haut de page     | miniatures dans `assets/mur/`, liste en haut de `js/home.js` (`WALL`) |
+| La ligne « Recherche un stage… »   | `index.html`, juste au-dessus du grand titre |
 
 Les images de projets vont dans `assets/projets/<slug>/` (un dossier par projet).
 La page d'un projet se construit avec la liste `story` de `js/projects.js` : une suite de blocs
@@ -30,11 +33,23 @@ insécables avant : ; ! ? sont aussi ajoutées toutes seules.
 
 ## Animations
 
-Navigation par étapes : sur l'accueil, un seul geste (cran de molette, glissement du doigt,
-flèche ↓ ou ↑ du clavier) passe du logo au premier projet, puis d'un projet à l'autre ;
-l'animation se joue toute seule. Après le dernier projet, le scroll redevient normal.
+Arrivée sur le site : la signature s'écrit au stylo, s'allume comme un néon, puis rejoint
+le centre de la barre du haut pendant que le rideau noir se lève sur le haut de page.
+Un geste (molette, clic, touche) pendant l'écriture l'accélère. L'animation ne se rejoue pas
+quand on revient d'une page projet (elle se rejoue si on recharge la page).
+Au survol, la signature de la barre du haut se réécrit ; en bas de chaque page, elle s'écrit en grand.
 
-Couvertures des projets : les écrans sont posés sur des iPhone et MacBook dessinés en CSS.
+Haut de page : derrière le titre, un mur incliné en 3D fait défiler les écrans des projets
+et suit doucement la souris.
+
+Navigation par étapes : sur l'accueil, un seul geste (cran de molette, glissement du doigt,
+flèche ↓ ou ↑ du clavier) passe du haut de page au premier projet, puis d'un projet à l'autre ;
+l'animation se joue toute seule. Chaque projet arrive incliné, comme un écran que l'on redresse.
+Après le dernier projet, le scroll redevient normal.
+
+Couvertures des projets : les écrans sont posés sur des iPhone et MacBook dessinés en CSS,
+inclinés en 3D (réglage `tilt` de chaque appareil dans `js/projects.js`) ; sur ordinateur,
+ils s'inclinent un peu plus sous la souris.
 Quand l'image se recadre pour laisser la place aux détails, les appareils se rapprochent
 et se réorganisent pour rester entiers dans le cadre. Leur place se règle dans `scene`
 (`js/projects.js`), pour trois formes de cadre : large, carré et haut.
@@ -51,7 +66,7 @@ Si tu vois encore une ancienne version : recharge avec Ctrl+F5.
 - [x] Les projets : FISHDEX, Borne EDNA et DJ Platform, tirés de Figma (`js/projects.js`)
 - [x] Textes des projets relus et alignés sur le CV
 - [x] Le CV (`assets/CV.pdf`)
-- [x] L'image d'« À propos » : le logo smiley sur un post-it
+- [x] L'image d'« À propos » : la signature sur un post-it
 - [x] Le parcours (`index.html`, section À propos)
 - [x] Le lien LinkedIn (section Contact de `index.html`)
 - [x] Compétences, logiciels et citation relus (logiciels alignés sur le CV)

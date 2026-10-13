@@ -291,10 +291,12 @@
       '<article class="case" style="--project:' + esc(p.accent || "var(--accent)") + '">' +
         '<header class="case__head">' +
           '<a class="back link" href="index.html#projets"><i class="ph ph-arrow-left"></i> Retour aux projets</a>' +
-          '<p class="case__type">' + esc(p.type) + "</p>" +
+          '<p class="case__type mono"><b>●</b>' + esc(p.type) + (p.year ? "<span>" + esc(p.year) + "</span>" : "") + "</p>" +
           '<h1 class="case__title heading">' + PF.words(p.title) + "</h1>" +
-          '<p class="case__summary" data-reveal>' + esc(p.summary) + "</p>" +
-          '<dl class="facts" data-reveal style="--n:' + (facts.match(/<dt>/g) || []).length + '">' + facts + "</dl>" +
+          '<div class="case__intro">' +
+            '<p class="case__summary" data-reveal>' + esc(p.summary) + "</p>" +
+            '<dl class="facts" data-reveal>' + facts + "</dl>" +
+          "</div>" +
         "</header>" +
 
         '<figure class="case__cover"><div class="media">' +
@@ -317,7 +319,7 @@
         (projects.length > 1
           ? '<a class="next" href="projet.html?p=' + encodeURIComponent(next.slug) + '">' +
               '<span class="next__inner">' +
-                '<span class="next__label">Projet suivant</span>' +
+                '<span class="next__label mono">Projet suivant</span>' +
                 '<span class="next__title heading">' + esc(next.title) + ' <i class="ph ph-arrow-right"></i></span>' +
               "</span>" +
             "</a>"
@@ -332,6 +334,8 @@
     var lay = function () { PF.sceneApply(sc, PF.sceneRect(sc)); };
     lay();
     window.addEventListener("resize", lay);
+    // les appareils s'inclinent sous la souris
+    PF.tiltDevices(document.querySelector(".case__cover"));
   }
 
   /* ---------- versions à onglets ---------- */
@@ -374,19 +378,42 @@
   /* ---------- animations ---------- */
   function animate() {
     if (!PF.animate) return;
-    var tl = gsap.timeline({ defaults: { ease: "expo.out", duration: 1.2 } });
+    var tl = gsap.timeline({ defaults: { ease: "expo.out", duration: 1.3 } });
     tl.fromTo(".back", { opacity: 0, x: -10 }, { opacity: 1, x: 0 }, 0)
       .fromTo(".case__type", { opacity: 0, y: 10 }, { opacity: 1, y: 0 }, 0.1)
       .fromTo(".case__title .w > span", { yPercent: 110, y: 0 }, { yPercent: 0, stagger: 0.07 }, 0.15);
 
-    // La couverture se recadre doucement pendant le scroll
+    // La couverture arrive inclinée et se redresse pendant le scroll
+    var coverBox = document.querySelector(".case__cover .media");
     var cover = document.querySelector(".case__visual");
+    if (coverBox) {
+      gsap.fromTo(coverBox, { rotationX: 24, scale: 0.9, transformPerspective: 1800, transformOrigin: "50% 0%" }, {
+        rotationX: 0, scale: 1, ease: "none",
+        scrollTrigger: { trigger: ".case__cover", start: "top 92%", end: "top 22%", scrub: true },
+      });
+    }
     if (cover) {
-      gsap.fromTo(cover, { scale: 1.1 }, {
+      gsap.fromTo(cover, { scale: 1.08 }, {
         scale: 1, ease: "none",
         scrollTrigger: { trigger: ".case__cover", start: "top bottom", end: "bottom top", scrub: true },
       });
     }
+
+    // Les scènes colorées s'ouvrent en entrant dans l'écran
+    gsap.utils.toArray(".story .stage").forEach(function (st) {
+      gsap.fromTo(st, { clipPath: "inset(6% 4% 6% 4% round 24px)" }, {
+        clipPath: "inset(0% 0% 0% 0% round 24px)", ease: "none",
+        scrollTrigger: { trigger: st, start: "top bottom", end: "top 45%", scrub: true },
+      });
+    });
+
+    // Les écrans larges arrivent inclinés, comme posés sur une table, et se redressent
+    gsap.utils.toArray(".showcase, .shot--device > .device, .versions__device").forEach(function (el) {
+      gsap.fromTo(el, { rotationX: 30, y: 70, transformPerspective: 1800, transformOrigin: "50% 100%" }, {
+        rotationX: 0, y: 0, ease: "none",
+        scrollTrigger: { trigger: el, start: "top bottom", end: "top 35%", scrub: true },
+      });
+    });
 
     // Les écrans plus longs que l'appareil (pages de site…) défilent pendant le scroll
     document.documentElement.classList.add("has-device-scroll");
@@ -405,14 +432,27 @@
       });
     });
 
-    // Les iPhone remontent légèrement en décalé
+    // Les iPhone arrivent en éventail (inclinés vers le centre) et remontent en décalé
     document.querySelectorAll(".phones").forEach(function (row) {
       var phones = row.querySelectorAll(".device");
-      if (window.matchMedia("(max-width: 767px)").matches) return;
-      gsap.fromTo(phones, { y: function (i) { return 40 + (i % 2) * 50; } }, {
-        y: function (i) { return -(i % 2) * 30; },
-        ease: "none",
-        scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: true },
+      var mid = (phones.length - 1) / 2;
+      var small = window.matchMedia("(max-width: 767px)").matches;
+      gsap.fromTo(phones, {
+        rotationY: function (i) { return (mid - i) * (small ? 8 : 12); },
+        rotationX: 14,
+        transformPerspective: 1400,
+      }, {
+        rotationY: 0, rotationX: 0, ease: "none",
+        scrollTrigger: { trigger: row, start: "top bottom", end: "top 30%", scrub: true },
+      });
+      if (small) return;
+      // l'appareil et son étiquette bougent ensemble
+      row.querySelectorAll(".phones__item").forEach(function (item, i) {
+        gsap.fromTo(item.querySelectorAll(".device, .phones__label"), { y: 40 + (i % 2) * 50 }, {
+          y: -(i % 2) * 30,
+          ease: "none",
+          scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: true },
+        });
       });
     });
   }

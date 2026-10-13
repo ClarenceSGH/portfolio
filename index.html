@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Clarence Seguy-Houel, designer UX/UI</title>
   <meta name="description" content="Portfolio de Clarence Seguy-Houel, designer UX/UI : études de cas, de la recherche utilisateur à l'interface.">
-  <meta name="theme-color" content="#f4f4f1">
+  <meta name="theme-color" content="#0c0c0e">
 
   <!-- Icône du site (onglet, favoris, écran d'accueil du téléphone) -->
   <link rel="icon" href="favicon.ico" sizes="32x32">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-32.png" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Inter:opsz,wght@14..32,400..700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Geist:wght@300..700&family=Geist+Mono:wght@400..500&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
   <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.20/dist/lenis.css">
   <link rel="stylesheet" href="css/style.css">
@@ -23,35 +24,62 @@
   <script>
     // .js : les scripts tournent. .motion : animations complètes, toujours activées
     // (même si l'ordinateur demande de réduire les animations).
-    document.documentElement.classList.add("js", "motion");
-    setTimeout(function () { if (!window.PF) document.documentElement.classList.remove("js"); }, 3000);
+    // .is-loading : la signature s'écrit à l'arrivée sur le site (pas en revenant d'une page projet).
+    (function (h) {
+      h.classList.add("js", "motion");
+      var nav = (window.performance && performance.getEntriesByType && performance.getEntriesByType("navigation")[0]) || {};
+      var interne = document.referrer && location.origin !== "null" && document.referrer.indexOf(location.origin) === 0;
+      if (location.hash.length < 2 && nav.type !== "back_forward" && (!interne || nav.type === "reload")) h.classList.add("is-loading");
+      setTimeout(function () { if (!window.PF) h.classList.remove("js", "is-loading"); }, 3000);
+    })(document.documentElement);
   </script>
 </head>
 <body class="page-home">
   <a class="skip" href="#projets">Aller aux projets</a>
 
+  <!-- ============ ARRIVÉE : la signature s'écrit, puis rejoint la barre du haut (js/home.js) ============ -->
+  <div class="loader" data-loader aria-hidden="true">
+    <div class="loader__bg" data-loader-bg></div>
+    <div class="loader__sig" data-loader-sig></div>
+    <p class="loader__note mono" data-loader-note><span>Clarence Seguy-Houel</span><span>Portfolio 2026</span></p>
+  </div>
+
   <nav class="nav" data-nav aria-label="Navigation principale">
     <ul class="nav__list">
-      <li><a href="#projets">Projets</a></li>
-      <li><a href="#a-propos">À propos</a></li>
+      <li><a href="#projets"><span class="roll"><span data-text="Projets">Projets</span></span></a></li>
+      <li><a href="#a-propos"><span class="roll"><span data-text="À propos">À propos</span></span></a></li>
     </ul>
-    <a class="nav__brand brand" href="#top" aria-label="Clarence Seguy-Houel, haut de page">
-      <span class="mask"><span>Clarence</span></span><span class="brand__logo"><img class="brand__logo-thin" src="assets/logo.png" alt="" width="667" height="693"><img class="brand__logo-bold" src="assets/logo-bold.png" alt="" width="697" height="723"></span>
+    <!-- la signature (logo) : remplacée par un dessin vectoriel animable au chargement -->
+    <a class="nav__brand" href="#top" aria-label="Clarence Seguy-Houel, haut de page" data-sig>
+      <img src="assets/signature.svg" alt="" width="581" height="492">
     </a>
     <ul class="nav__list nav__list--right">
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#contact"><span class="roll"><span data-text="Contact">Contact</span></span></a></li>
     </ul>
   </nav>
 
   <main id="contenu">
 
-    <!-- ============ 1. ARRIVÉE : uniquement le logo ============
-         Au premier scroll, le logo tourne, rétrécit et rejoint le centre
-         de la barre du haut ; le menu et le prénom apparaissent (js/home.js). -->
-    <section class="intro" id="top">
-      <h1 class="sr-only">Clarence Seguy-Houel, designer UX/UI</h1>
-      <div class="intro__logo" data-intro-logo>
-        <span class="brand__logo"><img class="brand__logo-thin" src="assets/logo.png" alt="" width="667" height="693"><img class="brand__logo-bold" src="assets/logo-bold.png" alt="" width="697" height="723"></span>
+    <!-- ============ 1. HAUT DE PAGE ============
+         Le titre, et derrière lui un mur incliné des écrans de mes projets (js/home.js). -->
+    <section class="hero" id="top">
+      <div class="wall" data-wall aria-hidden="true"></div>
+      <div class="hero__content">
+        <!-- disponibilité (reprise du CV) : modifie ou supprime cette ligne librement -->
+        <p class="hero__status mono" data-hero-item><span aria-hidden="true"></span>Recherche un stage d'un mois en février 2027</p>
+        <h1 class="hero__title heading">
+          <span class="sr-only">Clarence Seguy-Houel, designer UX/UI. </span>
+          <span class="line"><span>Des interfaces</span></span>
+          <span class="line"><span>simples,</span></span>
+          <span class="line"><span>avec&nbsp;du&nbsp;<span class="hero__mark">caractère<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M3 13 C 60 6, 120 4, 180 8 S 268 15, 297 7"/></svg></span>.</span></span>
+        </h1>
+        <div class="hero__foot">
+          <p class="hero__intro" data-hero-item><strong>Clarence Seguy-Houel</strong>, étudiant en UX/UI design à L'École de Design Nantes Atlantique. Je conçois des parcours simples, de la recherche utilisateur au prototype.</p>
+          <div class="hero__actions" data-hero-item>
+            <a class="btn btn--primary" href="#projets" data-magnetic>Voir les projets <i class="ph ph-arrow-down"></i></a>
+            <a class="hero__scroll mono" href="#projets" tabindex="-1"><span aria-hidden="true"></span>Défiler</a>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -64,31 +92,34 @@
 
     <!-- ============ 3. INFOS COMPLÉMENTAIRES, après les projets ============ -->
 
-    <!-- Citation en bleu, qui s'écrit au fil du scroll : modifie le texte librement -->
+    <!-- Citation qui s'écrit au fil du scroll : modifie le texte librement -->
     <section class="quote" aria-label="Citation">
+      <p class="quote__label mono">Ma méthode</p>
       <blockquote class="quote__text" data-chars>«&nbsp;Chaque écran commence par une question&nbsp;: qu'est-ce que la personne en face essaie de faire&nbsp;?&nbsp;»</blockquote>
     </section>
 
     <!-- ============ À PROPOS ============ -->
     <section class="about" id="a-propos" aria-labelledby="a-propos-titre">
-      <h2 class="about__title" id="a-propos-titre">À propos</h2>
+      <h2 class="about__title mono" id="a-propos-titre">À propos</h2>
       <p class="about__statement" data-words>Une bonne interface ne se remarque pas. Elle guide, elle rassure et laisse toute la place au contenu. Mon travail commence toujours par les personnes qui vont l'utiliser.</p>
 
       <div class="about__grid">
-        <!-- Mon logo smiley, dessiné au feutre sur un post-it collé au mur -->
-        <figure class="about__portrait media">
-          <img src="assets/postit-logo.jpg" alt="Mon logo : un smiley dessiné au feutre sur un post-it jaune collé au mur" width="1200" height="1500" loading="lazy" decoding="async">
+        <!-- Ma signature, au feutre sur un post-it vert fluo collé au mur -->
+        <figure class="about__portrait" data-tilt>
+          <div class="media">
+            <img src="assets/postit-signature.jpg" alt="Ma signature, mon logo, au feutre noir sur un post-it vert fluo collé au mur" width="1200" height="1500" loading="lazy" decoding="async">
+          </div>
         </figure>
 
         <div class="about__content">
           <p class="about__bio" data-reveal>Designer UX/UI, je conçois des parcours simples et des interfaces qui ont du caractère, de la recherche utilisateur au prototype. J'aime comprendre un problème en profondeur avant de dessiner le moindre écran : entretiens, parcours utilisateurs, puis prototypes testés et retravaillés jusqu'à ce que tout paraisse évident.</p>
           <div class="about__actions" data-reveal>
-            <a class="btn btn--primary" href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf">Télécharger le CV <i class="ph ph-download-simple"></i></a>
+            <a class="btn btn--primary" href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf" data-magnetic>Télécharger le CV <i class="ph ph-download-simple"></i></a>
           </div>
 
           <div class="skills">
             <div data-reveal>
-              <h3 class="about__subtitle">Recherche</h3>
+              <h3 class="about__subtitle mono">Recherche <b>01</b></h3>
               <ul>
                 <li>Entretiens utilisateurs</li>
                 <li>Personas</li>
@@ -97,7 +128,7 @@
               </ul>
             </div>
             <div data-reveal>
-              <h3 class="about__subtitle">Conception</h3>
+              <h3 class="about__subtitle mono">Conception <b>02</b></h3>
               <ul>
                 <li>Architecture de l'information</li>
                 <li>Wireframes</li>
@@ -106,7 +137,7 @@
               </ul>
             </div>
             <div data-reveal>
-              <h3 class="about__subtitle">Logiciels</h3>
+              <h3 class="about__subtitle mono">Logiciels <b>03</b></h3>
               <ul>
                 <li>Figma <small>avancé</small></li>
                 <li>Revit <small>bonne maîtrise</small></li>
@@ -117,7 +148,7 @@
               </ul>
             </div>
             <div data-reveal>
-              <h3 class="about__subtitle">IA</h3>
+              <h3 class="about__subtitle mono">IA <b>04</b></h3>
               <ul>
                 <li>Gemini</li>
                 <li>Claude</li>
@@ -128,7 +159,7 @@
 
           <!-- Parcours : remplace ces lignes par ta formation et tes expériences -->
           <div class="timeline" data-reveal>
-            <h3 class="about__subtitle">Parcours</h3>
+            <h3 class="about__subtitle mono">Parcours</h3>
             <ol>
               <li><time>2025 – maintenant</time><div><strong>Formation en design UX/UI</strong><span>L'École de Design Nantes Atlantique</span></div></li>
               <li><time>2025</time><div><strong>Bac technologique STI2D</strong><span>Lycée Réaumur</span></div></li>
@@ -141,7 +172,8 @@
 
     <!-- ============ CONTACT ============ -->
     <section class="contact" id="contact" aria-labelledby="contact-titre">
-      <h2 class="contact__title heading" id="contact-titre" data-reveal><span>Un projet&nbsp;?</span> <span>Écrivez-moi.</span></h2>
+      <p class="contact__label mono" data-reveal>Contact</p>
+      <h2 class="contact__title heading" id="contact-titre" data-split-lines><span class="line"><span>Un projet&nbsp;?</span></span><span class="line"><span><em>Écrivez-moi.</em></span></span></h2>
 
       <a class="contact__email" href="mailto:clarenceseguyhouel@gmail.com" data-email data-reveal>clarenceseguyhouel@gmail.com</a>
 
@@ -149,7 +181,7 @@
         <button class="btn btn--secondary" type="button" data-copy-email>
           <i class="ph ph-copy" aria-hidden="true"></i><span data-copy-label>Copier l'adresse</span>
         </button>
-        <a class="btn btn--primary" href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf">Télécharger le CV <i class="ph ph-download-simple"></i></a>
+        <a class="btn btn--primary" href="assets/CV.pdf" download="CV-Clarence-Seguy-Houel.pdf" data-magnetic>Télécharger le CV <i class="ph ph-download-simple"></i></a>
       </div>
 
       <ul class="socials" data-reveal>
@@ -159,14 +191,19 @@
   </main>
 
   <footer class="footer">
-    <p>© <span data-year>2026</span> Clarence Seguy-Houel</p>
-    <a href="#top">Haut de page <i class="ph ph-arrow-up"></i></a>
+    <!-- la signature s'écrit en grand au fil du scroll -->
+    <div class="footer__sig" data-footer-sig aria-hidden="true"></div>
+    <div class="footer__bar">
+      <p>© <span data-year>2026</span> Clarence Seguy-Houel</p>
+      <a href="#top">Haut de page <i class="ph ph-arrow-up"></i></a>
+    </div>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/lenis@1.1.20/dist/lenis.min.js"></script>
   <script src="js/projects.js"></script>
+  <script src="js/signature.js"></script>
   <script src="js/common.js"></script>
   <script src="js/home.js"></script>
 </body>
