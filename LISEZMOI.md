@@ -16,7 +16,8 @@
 | L'image d'« À propos »             | `assets/postit-signature.jpg` (la signature sur un post-it jaune collé sur un mur rose) ; change le `src` dans `index.html` pour en mettre une autre |
 | Mon logo (la signature)             | `js/signature.js` : le dessin et les traits du stylo pour l'animation d'écriture ; `assets/signature.svg` : la même signature en image (sans JavaScript). Les fichiers sources sont dans `Visuel/logo/` |
 | Couleurs de l'identité              | `css/style.css`, tout en haut : la palette (rouge #BD001E, rose #FAB3A9, jaune #F4D35E, marine #1D1E2C, cyan #DDFDFE), puis les couleurs du thème clair (`:root`) et du thème sombre (`[data-theme="dark"]`) |
-| La vue éclatée des écrans           | calques dans `assets/projets/<slug>/calques/` (exportés de Figma), réglages dans `explode` de chaque projet (`js/projects.js`) |
+| Les présentations animées des projets | `js/demos.js` pour l'animation, réglages dans `demo` de chaque projet (`js/projects.js`) ; composants exportés de Figma dans `assets/projets/fishdex/calques/` et `assets/projets/borne-edna/calques/`, logo de la borne dans `assets/projets/borne-edna/logo-borne.jpg` |
+| L'icône de l'onglet (favicon)      | `favicon.svg` (la signature rouge sur un carré cyan), avec ses versions `favicon.ico`, `assets/favicon-32.png`, `assets/icon-192.png`, `assets/icon-512.png` et `assets/apple-touch-icon.png` ; couleurs de l'appli installée dans `site.webmanifest` |
 | Le mur d'écrans du haut de page     | miniatures dans `assets/mur/`, liste en haut de `js/home.js` (`WALL`) |
 | La phrase « Je recherche un stage… » | `index.html`, dernière phrase sous le grand titre |
 
@@ -45,24 +46,32 @@ et suit doucement la souris.
 
 Navigation par étapes : sur l'accueil, un seul geste (cran de molette, glissement du doigt,
 flèche ↓ ou ↑ du clavier) passe du haut de page au premier projet, puis d'un projet à l'autre ;
-l'animation se joue toute seule. Chaque projet arrive incliné, comme un écran que l'on redresse.
+l'animation se joue toute seule. Chaque projet glisse par-dessus le précédent, légèrement incliné,
+puis se redresse.
 Après le dernier projet, le scroll redevient normal.
 
-Vue éclatée : après les projets, un écran de chaque projet (FISHDEX, la borne, DJ Platform)
-arrive en calques séparés qui flottent en 3D, puis se rassemblent au fil du scroll pour former
-l'interface. La même vue se trouve dans chaque page projet. Pour en ajouter un, exporte les
-calques depuis Figma dans `assets/projets/<slug>/calques/` et décris-les dans `explode`
-(position x, y et largeur w de chaque calque dans l'écran Figma).
+Projets en mouvement : après les projets, chaque projet a sa présentation animée, pilotée
+par le scroll (`js/demos.js`). La même se trouve dans sa page projet (bloc `demo`).
+- FISHDEX : les composants de l'écran « Belle prise ! » sont éparpillés sur un canevas
+  façon Figma ; la souris « Clarence » les attrape un à un et les remet dans le téléphone.
+  Le dernier, le grand poisson, se pêche : la souris saisit une canne, ferre le poisson et le
+  dépose dans la carte. Place des composants, ordre (`step`) et poses de la canne dans `demo`.
+- Borne EDNA : les cartes de l'accueil tournent sur un anneau en 3D autour de la borne, puis
+  reviennent devant et se rangent dans leurs emplacements de l'écran. Réglages `orbit` dans `demo`.
+- DJ Platform : une table de mixage ; le téléphone est l'écran central, entre deux platines
+  (wireframe et maquette). Le scroll pousse le crossfader : l'écran passe du wireframe à la
+  maquette, les disques tournent plus vite quand on scrolle.
 
 Pages projet : quand une page de site défile dans un écran (MacBook, iPhone), l'appareil reste
 fixe à l'écran le temps que la page défile, puis la lecture reprend.
 
-Thème clair / sombre : le bouton lune / soleil de la barre du haut. Le choix est gardé ;
-sans choix, le site suit le réglage de l'ordinateur.
+Thème clair / sombre : le bouton lune / soleil de la barre du haut. Le thème clair est le thème
+principal : c'est lui qui s'affiche au premier passage. Le choix du visiteur est gardé.
 
 Couvertures des projets : les écrans sont posés sur des iPhone et MacBook dessinés en CSS,
 inclinés en 3D (réglage `tilt` de chaque appareil dans `js/projects.js`) ; sur ordinateur,
-ils s'inclinent un peu plus sous la souris.
+ils s'inclinent un peu plus sous la souris. Le fond est éclairé comme en studio et les
+appareils flottent doucement.
 Quand l'image se recadre pour laisser la place aux détails, les appareils se rapprochent
 et se réorganisent pour rester entiers dans le cadre. Leur place se règle dans `scene`
 (`js/projects.js`), pour trois formes de cadre : large, carré et haut.

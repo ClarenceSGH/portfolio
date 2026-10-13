@@ -18,18 +18,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Geist:wght@300..700&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
   <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.20/dist/lenis.css">
   <link rel="stylesheet" href="css/style.css">
 
   <script>
     // .js : les scripts tournent. .motion : animations complètes, toujours activées
     // (même si l'ordinateur demande de réduire les animations).
-    // data-theme : thème clair ou sombre (choix gardé, sinon celui de l'ordinateur).
+    // data-theme : thème clair par défaut, ou sombre si la personne l'a choisi (choix gardé).
     (function (h) {
       h.classList.add("js", "motion");
       var theme = null;
       try { theme = localStorage.getItem("pf-theme"); } catch (e) {}
-      if (theme !== "dark" && theme !== "light") theme = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      if (theme !== "dark" && theme !== "light") theme = "light"; // le thème clair est le thème principal
       h.setAttribute("data-theme", theme);
       if (theme === "dark") document.querySelector('meta[name="theme-color"]').setAttribute("content", "#1d1e2c");
       setTimeout(function () { if (!window.PF) h.classList.remove("js"); }, 3000);
@@ -72,6 +73,7 @@
   <script src="js/projects.js"></script>
   <script src="js/signature.js"></script>
   <script src="js/common.js"></script>
+  <script src="js/demos.js"></script>
   <script src="js/project.js"></script>
 </body>
 </html>

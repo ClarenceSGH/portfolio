@@ -224,18 +224,17 @@
       return chapter(b) + '<ul class="personas">' + cards + "</ul>";
     },
 
-    // vue éclatée d'un écran : les calques sont dans "explode" du projet
-    explode: function (b) {
+    // présentation animée du projet (js/demos.js, réglages dans "demo" du projet)
+    demo: function (b, p) {
       return (
-        '<section class="explode explode--story" data-explode aria-label="' + esc(b.title || "") + '">' +
-          '<div class="explode__pin">' +
-            '<div class="explode__text">' +
+        '<section class="demo demo--' + esc(p.slug) + '" data-demo="' + esc(p.slug) + '" aria-label="' + esc(b.title || "") + '">' +
+          '<div class="demo__pin">' +
+            '<div class="demo__text">' +
               (b.kicker ? '<span class="chapter__num">' + esc(b.kicker) + "</span>" : "") +
-              '<h2 class="explode__title heading">' + esc(b.title || "") + "</h2>" +
-              (b.text ? '<p class="explode__lead">' + esc(b.text) + "</p>" : "") +
-              '<div class="explode__infos" data-explode-infos></div>' +
+              '<h2 class="demo__title heading">' + esc(b.title || "") + "</h2>" +
+              (b.text ? '<p class="demo__lead">' + esc(b.text) + "</p>" : "") +
             "</div>" +
-            '<div class="explode__stage" data-explode-stage aria-hidden="true"></div>' +
+            '<div class="demo__stage" data-demo-stage aria-hidden="true"></div>' +
           "</div>" +
         "</section>"
       );
@@ -501,7 +500,7 @@
   initCover();
   PF.start();
   if (index !== -1) {
-    main.querySelectorAll("[data-explode]").forEach(function (sec) { PF.explode(sec, [{ data: projects[index].explode }]); });
+    if (PF.demos) PF.demos(main);
   }
   initVersions();
   animate();

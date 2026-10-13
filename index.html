@@ -18,19 +18,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Geist:wght@300..700&display=swap">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
   <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.20/dist/lenis.css">
   <link rel="stylesheet" href="css/style.css">
 
   <script>
     // .js : les scripts tournent. .motion : animations complètes, toujours activées
     // (même si l'ordinateur demande de réduire les animations).
-    // data-theme : thème clair ou sombre (choix gardé, sinon celui de l'ordinateur).
+    // data-theme : thème clair par défaut, ou sombre si la personne l'a choisi (choix gardé).
     // .is-loading : la signature s'écrit à l'arrivée sur le site (pas en revenant d'une page projet).
     (function (h) {
       h.classList.add("js", "motion");
       var theme = null;
       try { theme = localStorage.getItem("pf-theme"); } catch (e) {}
-      if (theme !== "dark" && theme !== "light") theme = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      if (theme !== "dark" && theme !== "light") theme = "light"; // le thème clair est le thème principal
       h.setAttribute("data-theme", theme);
       if (theme === "dark") document.querySelector('meta[name="theme-color"]').setAttribute("content", "#1d1e2c");
       var nav = (window.performance && performance.getEntriesByType && performance.getEntriesByType("navigation")[0]) || {};
@@ -92,17 +93,42 @@
       <div class="stack" data-stack></div>
     </section>
 
-    <!-- ============ 3. VUE ÉCLATÉE : un écran de chaque projet, calque par calque ============
-         Les calques viennent des maquettes Figma (assets/projets/<projet>/calques/,
-         réglages dans "explode" de js/projects.js). Ils se rassemblent au fil du scroll. -->
-    <section class="explode" id="calques" aria-labelledby="calques-titre" data-explode>
-      <div class="explode__pin">
-        <div class="explode__text">
-          <h2 class="explode__title heading" id="calques-titre">Trois écrans, calque par calque</h2>
-          <p class="explode__lead">Les calques de mes maquettes Figma, du fond jusqu'au bouton principal, reprennent leur place pour former l'interface.</p>
-          <div class="explode__infos" data-explode-infos></div>
+    <!-- ============ 3. LES PROJETS EN MOUVEMENT ============
+         Une présentation animée par projet, pilotée par le scroll (js/demos.js,
+         réglages dans "demo" de js/projects.js). Les textes se modifient ici. -->
+    <section class="demo demo--fishdex" id="fishdex-anime" aria-labelledby="demo-fishdex" data-demo="fishdex">
+      <div class="demo__pin">
+        <div class="demo__text">
+          <p class="label">FISHDEX, l'écran « Belle prise ! »</p>
+          <h2 class="demo__title heading" id="demo-fishdex">Chaque élément à sa place</h2>
+          <p class="demo__lead">Les composants de la maquette Figma sont éparpillés autour du téléphone. La souris les remet un à un à leur place. Le dernier, lui, se pêche.</p>
+          <a class="link demo__link" href="projet.html?p=fishdex">Voir l'étude de cas FISHDEX <i class="ph ph-arrow-right"></i></a>
         </div>
-        <div class="explode__stage" data-explode-stage aria-hidden="true"></div>
+        <div class="demo__stage" data-demo-stage aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section class="demo demo--borne-edna" aria-labelledby="demo-borne" data-demo="borne-edna">
+      <div class="demo__pin">
+        <div class="demo__text">
+          <p class="label">Borne EDNA, l'accueil</p>
+          <h2 class="demo__title heading" id="demo-borne">Un accueil en orbite</h2>
+          <p class="demo__lead">Les cartes de l'accueil gravitent autour de la borne, puis viennent se ranger dans l'écran au fil du scroll.</p>
+          <a class="link demo__link" href="projet.html?p=borne-edna">Voir l'étude de cas Borne EDNA <i class="ph ph-arrow-right"></i></a>
+        </div>
+        <div class="demo__stage" data-demo-stage aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section class="demo demo--dj-platform" aria-labelledby="demo-dj" data-demo="dj-platform">
+      <div class="demo__pin">
+        <div class="demo__text">
+          <p class="label">DJ Platform, l'accueil mobile</p>
+          <h2 class="demo__title heading" id="demo-dj">Du wireframe à la maquette</h2>
+          <p class="demo__lead">Le scroll pousse le crossfader : l'écran passe de la structure à l'interface finale, comme un DJ enchaîne deux morceaux.</p>
+          <a class="link demo__link" href="projet.html?p=dj-platform">Voir l'étude de cas DJ Platform <i class="ph ph-arrow-right"></i></a>
+        </div>
+        <div class="demo__stage" data-demo-stage aria-hidden="true"></div>
       </div>
     </section>
 
@@ -221,6 +247,7 @@
   <script src="js/projects.js"></script>
   <script src="js/signature.js"></script>
   <script src="js/common.js"></script>
+  <script src="js/demos.js"></script>
   <script src="js/home.js"></script>
 </body>
 </html>

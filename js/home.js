@@ -5,7 +5,7 @@
    2. Haut de page : le titre, et un mur incliné des écrans des projets.
    3. Projets empilés : chaque projet arrive en plein cadre (incliné en 3D),
       puis le scroll recadre l'image et fait apparaître ses détails.
-   4. Vue éclatée d'un écran de chaque projet, qui se rassemble au fil du scroll.
+   4. Présentations animées des trois projets (js/demos.js).
    5. Citation et texte écrits au fil du scroll.
    ========================================================== */
 (function () {
@@ -271,8 +271,8 @@
       if (i > 0) {
         gsap.set(p, { yPercent: 100 });
         // le projet suivant arrive incliné, comme un écran que l'on redresse
-        gsap.set(p.querySelector(".panel__stage"), { rotationX: 22 });
-        gsap.set(p.querySelector(".panel__visual"), { scale: 1.15 });
+        gsap.set(p.querySelector(".panel__stage"), { rotationX: 9 });
+        gsap.set(p.querySelector(".panel__visual"), { scale: 1.08 });
         gsap.set(p.querySelectorAll(".panel__title .w > span"), { yPercent: 110 });
       }
     });
@@ -284,7 +284,7 @@
       scrollTrigger: { trigger: stack, start: "top bottom", end: "top top", scrub: true },
     })
       .fromTo(first.querySelector(".panel__inner"), { scale: 0.88 }, { scale: 1 }, 0)
-      .fromTo(first.querySelector(".panel__stage"), { rotationX: 24 }, { rotationX: 0 }, 0);
+      .fromTo(first.querySelector(".panel__stage"), { rotationX: 10 }, { rotationX: 0 }, 0);
     gsap.fromTo(first.querySelectorAll(".panel__title .w > span"), { yPercent: 110 }, {
       yPercent: 0, duration: 1.2, ease: "expo.out", stagger: 0.06,
       scrollTrigger: { trigger: stack, start: "top 55%", toggleActions: "play none none reverse" },
@@ -298,7 +298,7 @@
         start: "top top",
         end: function () { return "+=" + Math.round(tl.duration() * window.innerHeight * 0.6); },
         pin: true,
-        scrub: 0.4,
+        scrub: 0.8,
         invalidateOnRefresh: true,
         refreshPriority: 1, // calculé avant les animations placées plus bas dans la page
       },
@@ -309,7 +309,7 @@
       if (i > 0) {
         var prev = panels[i - 1];
         tl.addLabel("p" + i)
-          .to(p, { yPercent: 0, duration: 1 }, "p" + i)
+          .to(p, { yPercent: 0, duration: 1, ease: "power1.inOut" }, "p" + i)
           .to(p.querySelector(".panel__stage"), { rotationX: 0, duration: 1, ease: "power2.out" }, "p" + i)
           .fromTo(prev.querySelector(".panel__inner"), { scale: 1 }, { scale: 0.93, duration: 1, immediateRender: false }, "p" + i)
           .to(prev.querySelector(".panel__veil"), { opacity: 0.82, duration: 1 }, "p" + i)
@@ -562,15 +562,8 @@
   var stage = initStack();
   if (!stage) initStaticScenes();
   if (stage) initSteps(stage);
-  // vue éclatée : un écran de chaque projet, l'un après l'autre
-  PF.explode(document.querySelector("[data-explode]"), projects.filter(function (p) { return p.explode; }).map(function (p) {
-    return {
-      data: p.explode,
-      label: p.title + ", " + p.explode.name,
-      url: "projet.html?p=" + encodeURIComponent(p.slug),
-      link: "Voir l'étude de cas " + p.title,
-    };
-  }));
+  // présentations animées des trois projets (js/demos.js)
+  if (PF.demos) PF.demos();
   initQuote();
   initStatement();
   initLoader(hero);

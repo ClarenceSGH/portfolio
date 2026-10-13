@@ -23,7 +23,7 @@
      personas  fiches personas
      columns   colonnes de listes (ex. : niveaux d'accès)
      statement grande phrase mise en avant
-     explode   vue éclatée d'un écran (calques dans "explode", voir FISHDEX)
+     demo      présentation animée du projet (réglages dans "demo", js/demos.js)
 
    Images : dans assets/projets/<slug>/
    ========================================================== */
@@ -52,31 +52,41 @@ window.PROJECTS = [
     },
     stage: "#272a94",
     accent: "#3236b0",
-    // Vue éclatée de l'écran « Belle prise ! » : calques exportés de Figma,
-    // du fond vers le dessus. x, y, w : position et largeur dans l'écran (375 × 817).
-    explode: {
-      name: "l'écran « Belle prise ! »",
-      device: "phone",
+    // Présentation animée de l'écran « Belle prise ! » (js/demos.js) : les composants,
+    // exportés de Figma, sont éparpillés autour du téléphone puis remis à leur place.
+    // items : x, y, w, h dans l'écran (375 × 817) ; at : [centre x, centre y, rotation, échelle]
+    // une fois éparpillé ; step : ordre de remise en place ; rod : le composant pêché ;
+    // frame : posé sur un cadre tant qu'il est éparpillé (true : couleur de l'écran, ou une couleur),
+    // pour que les textes restent lisibles sur le canevas.
+    demo: {
       base: "assets/projets/fishdex/calques/",
       screen: { w: 375, h: 817, bg: "#272a94" },
-      layers: [
-        { name: "Fond", plate: true },
-        { name: "En-tête", items: [
-          { src: "fleche.svg", x: 11, y: 40, w: 40 },
-          { src: "titre.svg", x: 43, y: 36, w: 290 },
-          { src: "date.svg", x: 79.3, y: 162.1, w: 217, emoji: [["🕐", 37.4, 0], ["📍", 0, 25.9]] },
+      world: 1110, // largeur totale (téléphone + composants éparpillés), en unités de l'écran
+      cursor: [470, 790], // position de repos de la souris
+      parts: [
+        { name: "Bouton principal", step: 7, at: [575, 608, 3], items: [{ src: "bouton.svg", x: 56, y: 735, w: 264, h: 60 }] },
+        { name: "Carte", step: 2, at: [610, 300, 6, 0.82], items: [{ src: "carte.svg", x: 36, y: 223, w: 304, h: 495 }] },
+        { name: "Illustration", step: 3, at: [-190, 380, 0, 0.9], items: [{ src: "cercle.svg", x: 73, y: 354, w: 229, h: 233 }] },
+        { name: "Petits poissons", step: 5, at: [-175, 600, -10], items: [
+          { src: "poisson-petit.svg", x: 101.7, y: 367.7, w: 74, h: 90.6 },
+          { src: "poisson-petit.svg", x: 227.3, y: 379.3, w: 74, h: 90.6 },
         ] },
-        { name: "Carte", items: [{ src: "carte.svg", x: 36, y: 223, w: 304 }] },
-        { name: "Illustration", items: [{ src: "cercle.svg", x: 73, y: 354, w: 229 }] },
-        { name: "Poissons", items: [
-          { src: "poisson-petit.svg", x: 101.7, y: 367.7, w: 74 },
-          { src: "poisson-petit.svg", x: 227.3, y: 379.3, w: 74 },
-          { src: "poisson-grand.svg", x: 88.9, y: 373.5, w: 203 },
+        { name: "Grand poisson", rod: true, at: [620, 745, -6, 0.9], items: [{ src: "poisson-grand.svg", x: 88.9, y: 373.5, w: 203, h: 249.2 }] },
+        { name: "Nom de l'espèce", step: 4, frame: "#e4e4f2", at: [600, 40, 4], items: [{ src: "nom.svg", x: 99.6, y: 266, w: 178, h: 64.5 }] },
+        { name: "Actions", step: 6, at: [-200, 780, -3], items: [
+          { src: "partage.svg", x: 64, y: 623, w: 67, h: 67 },
+          { src: "info.svg", x: 137, y: 623, w: 181, h: 67 },
         ] },
-        { name: "Nom de l'espèce", items: [{ src: "nom.svg", x: 99.6, y: 266, w: 178 }] },
-        { name: "Actions", items: [{ src: "partage.svg", x: 64, y: 623, w: 67 }, { src: "info.svg", x: 137, y: 623, w: 181 }] },
-        { name: "Bouton principal", items: [{ src: "bouton.svg", x: 56, y: 735, w: 264 }] },
+        { name: "En-tête", step: 1, frame: true, at: [-215, 100, -4, 0.92], items: [
+          { src: "fleche.svg", x: 11, y: 40, w: 40, h: 40 },
+          { src: "titre.svg", x: 43, y: 36, w: 290, h: 87 },
+          { src: "date.svg", x: 79.3, y: 162.1, w: 217, h: 42, emoji: [["🕐", 37.4, 0], ["📍", 0, 25.9]] },
+        ] },
       ],
+      // la canne à pêche, tenue par la souris : len = longueur ; poses [talon x, talon y, angle]
+      // pendant la pêche, poisson remonté, au-dessus de sa place ; bite : point d'accroche
+      // sur le dos du poisson, depuis son centre
+      rod: { len: 440, fish: [480, 470, 110], lift: [500, 400, 104], over: [520, 330, 52], bite: [8.5, -69.6] },
     },
     fonts: "family=Climate+Crisis&family=Josefin+Sans:wght@400;700",
     summary:
@@ -103,9 +113,9 @@ window.PROJECTS = [
         ],
       },
       {
-        t: "explode",
-        title: "Un écran, calque par calque",
-        text: "L'écran « Belle prise ! » démonté : le fond, l'en-tête, la carte, l'illustration, puis les actions. Au fil du scroll, chaque calque reprend sa place.",
+        t: "demo",
+        title: "Chaque élément à sa place",
+        text: "L'écran « Belle prise ! » en pièces détachées : comme dans Figma, chaque composant reprend sa place au fil du scroll. Le dernier, lui, se pêche.",
       },
       {
         t: "text",
@@ -195,19 +205,21 @@ window.PROJECTS = [
     },
     stage: "#e6e4de",
     accent: "#c63148",
-    // Vue éclatée de l'accueil de la borne (écran 1728 × 1117 dans Figma)
-    explode: {
-      name: "l'accueil de la borne",
-      device: "kiosk",
+    // Présentation animée de l'accueil (js/demos.js) : les cartes gravitent autour de la
+    // borne, puis se rangent dans l'écran (1728 × 1117 dans Figma) au fil du scroll.
+    // orbit : [décalage en hauteur sur l'anneau (en largeurs de borne),
+    // échelle en orbite, rotation en orbite (degrés)] ; sans orbit, le composant est déjà en place ;
+    // frame : posé sur une carte blanche tant qu'il flotte.
+    demo: {
       base: "assets/projets/borne-edna/calques/",
       screen: { w: 1728, h: 1117, bg: "#ffffff" },
-      layers: [
-        { name: "Fond", plate: true },
-        { name: "Barre latérale", items: [{ src: "barre.webp", x: 0, y: 0, w: 115 }] },
-        { name: "Date et heure", items: [{ src: "heure.webp", x: 105, y: 15, w: 162 }] },
-        { name: "Météo", items: [{ src: "meteo.webp", x: 256, y: 133, w: 1360 }] },
-        { name: "Transports", items: [{ src: "transports.webp", x: 256, y: 493, w: 1360 }] },
-        { name: "Agenda", items: [{ src: "agenda.webp", x: 256, y: 853, w: 1360 }] },
+      logo: "assets/projets/borne-edna/logo-borne.jpg",
+      parts: [
+        { name: "Barre latérale", items: [{ src: "barre.webp", x: 0, y: 0, w: 115, h: 1117 }] },
+        { name: "Date et heure", frame: true, orbit: [0.02, 2.1, 0], items: [{ src: "heure.webp", x: 105, y: 15, w: 162, h: 82 }] },
+        { name: "Météo", orbit: [-0.03, 0.95, 0], items: [{ src: "meteo.webp", x: 256, y: 133, w: 1360, h: 210 }] },
+        { name: "Transports", orbit: [0.03, 0.95, 0], items: [{ src: "transports.webp", x: 256, y: 493, w: 1360, h: 210 }] },
+        { name: "Agenda", orbit: [0, 0.95, 0], items: [{ src: "agenda.webp", x: 256, y: 853, w: 1360, h: 210 }] },
       ],
     },
     fonts: "family=Montserrat:wght@400;700",
@@ -289,9 +301,9 @@ window.PROJECTS = [
         ],
       },
       {
-        t: "explode",
-        title: "L'accueil, calque par calque",
-        text: "L'accueil de la borne démonté : la barre latérale, l'heure, puis les trois cartes météo, transports et agenda. Au fil du scroll, chaque calque reprend sa place.",
+        t: "demo",
+        title: "Un accueil en orbite",
+        text: "Les cartes de l'accueil gravitent autour de la borne, puis viennent se ranger dans l'écran au fil du scroll : la barre latérale, l'heure, la météo, les transports et l'agenda.",
       },
       {
         t: "palette",
@@ -348,26 +360,11 @@ window.PROJECTS = [
     },
     stage: "#0d0322",
     accent: "#5e01fe",
-    // Vue éclatée de la page de recherche (haut de la page, 1512 × 980 dans Figma)
-    explode: {
-      name: "la page de recherche",
-      device: "laptop",
-      base: "assets/projets/dj-platform/calques/",
-      screen: { w: 1512, h: 980, bg: "#0a001b" },
-      layers: [
-        { name: "Fond", plate: true },
-        { name: "Navigateur", items: [{ src: "navigateur.webp", x: 0, y: 0, w: 1512 }] },
-        { name: "Barre de navigation", items: [{ src: "nav.webp", x: 0, y: 118, w: 1512 }] },
-        { name: "Recherche", items: [{ src: "recherche.webp", x: 229, y: 234, w: 1053 }] },
-        { name: "Formulaire", items: [{ box: { bg: "rgba(43, 1, 117, 0.3)", border: "1px solid #d9d9d9", r: 20 }, x: 229, y: 317, w: 1053, h: 659 }] },
-        { name: "Critères", items: [{ src: "criteres.webp", x: 254, y: 352, w: 432 }] },
-        { name: "Calendrier", items: [
-          { src: "calendrier.webp", x: 777, y: 352, w: 457 },
-          { src: "jours.svg", x: 917.8, y: 435.6, w: 301.6 },
-          { src: "apartir.webp", x: 778.6, y: 800.3, w: 143.1 },
-        ] },
-        { name: "Bouton Valider", items: [{ src: "valider.webp", x: 1055, y: 900, w: 178 }] },
-      ],
+    // Présentation animée (js/demos.js) : une table de mixage ; le crossfader, poussé par
+    // le scroll, fait passer l'écran du wireframe à la maquette.
+    demo: {
+      wireframe: "assets/projets/dj-platform/wireframe-accueil.jpg",
+      maquette: "assets/projets/dj-platform/accueil-mobile.jpg",
     },
     fonts: "family=Saira:wght@400;700",
     summary:
@@ -407,6 +404,11 @@ window.PROJECTS = [
         ],
       },
       {
+        t: "demo",
+        title: "Du wireframe à la maquette",
+        text: "Le scroll pousse le crossfader : l'accueil passe de la structure à l'interface finale, comme un DJ enchaîne deux morceaux.",
+      },
+      {
         t: "text",
         kicker: "03",
         title: "Une recherche guidée",
@@ -414,9 +416,10 @@ window.PROJECTS = [
           "Le formulaire reprend les critères qui comptent pour organiser une soirée : type d'événement et de lieu, genres musicaux, équipement en plus, budget maximum, puis la date et l'heure dans un calendrier.",
       },
       {
-        t: "explode",
-        title: "La recherche, calque par calque",
-        text: "La page de recherche démontée : la barre de navigation, la recherche, puis le formulaire, ses critères et le calendrier. Au fil du scroll, chaque calque reprend sa place.",
+        t: "image",
+        device: "mac",
+        src: "assets/projets/dj-platform/recherche.jpg", w: 1512, h: 891,
+        alt: "Formulaire de recherche : type d'événement, lieu, genres, équipement, budget, calendrier et heure",
       },
       {
         t: "text",
