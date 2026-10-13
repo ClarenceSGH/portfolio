@@ -471,7 +471,8 @@ button { font: inherit; color: inherit; }
 /* un bloc d'infos par écran, superposés : seul celui de l'écran visible s'affiche */
 .explode__infos { display: grid; margin-top: 28px; }
 .explode__info { grid-area: 1 / 1; transition: opacity 0.35s var(--ease-out), visibility 0.35s; }
-.explode__info:not(.is-active) { opacity: 0; visibility: hidden; }
+/* l'ancien bloc disparaît tout de suite, le nouveau arrive en fondu : jamais deux textes mêlés */
+.explode__info:not(.is-active) { opacity: 0; visibility: hidden; transition: none; }
 .explode__project { margin-bottom: 10px; font-weight: 600; }
 .explode__layers { display: grid; gap: 2px; counter-reset: calque; }
 .explode__layers li {
